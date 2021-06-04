@@ -1,286 +1,204 @@
-import sun.rmi.runtime.Log;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import javax.print.DocFlavor;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.io.*;
+import java.lang.*;
 
-class Client extends JFrame implements ActionListener {
-  String ip, port, id;
-  int portN = 0;
+
+class Client extends Thread {
+  String name = "";
+  String type;
+  String topic[];
+  Boolean playButton;
+  int playNum;
+  String filename = "";
+  FileReader fr = null;
+  BufferedReader brkey = new BufferedReader(new InputStreamReader(System.in));
+  BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  String line = "";
+  String id, ip, port;
+  InputStream is;
+  OutputStream os;
+  DataInputStream dis;
+  DataOutputStream dos;
   Socket s;
-  JFrame frame;
-  LoginUi ui;
-  ////////////////////////////////////// ↓채팅프레임 멤버
-  JTextArea ta = new JTextArea();
-  JTextField topicTf, timeTf, chatTf;
-  String idList[] = {"asd", "assd", "asdasasdasdasdasdd"};
-  JComboBox idCb;
-  JScrollPane sp;
-  JPanel tfP, p1, p1_1, p1_2, p1_3, p1_4, p2, p2_1, p2_2, p2_3, p2_4, taP, northP, endP, chatP;
-  RoundedButton endBtn = new RoundedButton("나가기");
-  Container cp;
-  Font 맑은고딕 = new Font("맑은 고딕", Font.BOLD, 20);
-  Font 맑은고딕일반 = new Font("맑은 고딕", Font.PLAIN, 20);
+  ClientUi cui;
+  ArrayList<String> topicNames = new ArrayList<String>();
+  Thread listenTh = new Thread(this);
+  Thread speakTh = new Thread(this);
 
-  Client(LoginUi ui, JFrame frame) {
+
+  Client(ClientUi cui) {
+    this.cui = cui;
+    this.ip = cui.ip;
+    this.port = cui.port;
+    this.id = cui.id;
+    System.out.println("ip: "+ip+"port: "+port+"id: "+id);
+   /* id="치훈"; // todo
+    ui.ip="127.0.0.1"; // todo
+    ui.port = "3000"; // todo
+
+      System.out.println("서버IP(기본:"+ui.ip+")");
+      System.out.println("설정할 IP");
+      System.out.print("=>");
+      ui.ip = br.readLine();
+      ui.ip.trim();
+      if (ui.ip.length() == 0) ui.ip = "127.0.0.1"; // todo
+      System.out.println("PORT(기본:"+ui.port+")");
+      System.out.println("설정할 PORT");
+      System.out.print("=>");
+      ui.port = br.readLine();
+      ui.port = ui.port.trim();
+      if (ui.port.length() == 0) ui.port = "3000"; // todo
+      System.out.println("PORT(기본:"+ui.id+")");
+      System.out.println("설정할 ID");
+      System.out.print("=>");
+      ui.id=br.readLine();
+      ui.id.trim();
+      if(ui.id.length()==0) ui.id="치훈";
+      System.out.println("받은 IP: " + ui.ip + "\n받은 port: " + ui.port + "\n받은 ID: " + ui.id + "(으)로 로그인합니다.");
+      int uiport = Integer.parseInt(ui.port);
+      if (uiport < 0 || uiport > 65535) {
+        System.out.println("범위가 유효하지않습니다.\n다시 입력하여주세요");
+        return;
+      }*/
     try {
-      this.frame = frame;
-      this.ui = ui;
-      id = ui.id.trim();
-      ip = ui.ip.trim();
-
-      System.out.println(ui.ip + ui.port + ui.id);
-
-      init();
-      setUi();
-      human();
-    } catch (Exception e) {
-
-    }
-  }
-
-  void init() {
-
-    cp = getContentPane();
-    cp.setLayout(new BorderLayout());                                             //cp
-
-    northP = new JPanel(new BorderLayout());
-    tfP = new JPanel();
-    topicTf = new JTextField(10);
-    topicTf.setEnabled(false);
-    topicTf.setFont(맑은고딕);
-    JPanel topicP = new JPanel(new BorderLayout());
-    topicP.add(topicTf, BorderLayout.EAST);
-    timeTf = new JTextField(10);
-    timeTf.setEnabled(false);
-    timeTf.setFont(맑은고딕);
-    idCb = new JComboBox(idList);
-    JPanel selectP = new JPanel(new BorderLayout());
-    selectP.add(timeTf, BorderLayout.WEST);
-    tfP.add(topicP);
-    tfP.add(selectP);
-    tfP.add(idCb);
-    tfP.setBackground(Color.black);                                       //상단 색
-    northP.add(tfP, BorderLayout.SOUTH);
-    cp.add(northP, BorderLayout.NORTH);                                      //northP
-
-    chatP = new JPanel();
-    chatTf = new JTextField(30);
-    chatTf.setFont(맑은고딕일반);
-    chatP.add(chatTf);
-    endBtn.addActionListener(this);
-    endP = new JPanel();
-    chatP.add(endBtn);
-    chatP.setBackground(Color.black);
-    cp.add(chatP, BorderLayout.SOUTH);                                               //chatTf
-
-    p1 = new JPanel();                                                                   //사이드 패널
-    p1.setPreferredSize(new Dimension(150, 600));
-    p1.setLayout(new GridLayout(4, 1));
-
-    p1_1 = new JPanel(new BorderLayout());
-    JLabel lb1_1 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_1 = new JLabel("안녕");
-    idlb1_1.setFont(맑은고딕);
-    idlb1_1.setHorizontalAlignment(0);
-    idlb1_1.setForeground(Color.black);
-    idlb1_1.setBackground(Color.gray);
-    idlb1_1.setOpaque(true);
-    p1_1.add(lb1_1);
-    p1_1.add(idlb1_1, BorderLayout.SOUTH);
-    p1.add(p1_1);
-
-    p1_2 = new JPanel(new BorderLayout());
-    JLabel lb1_2 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_2 = new JLabel("안녕");
-    idlb1_2.setFont(맑은고딕);
-    idlb1_2.setHorizontalAlignment(0);
-    idlb1_2.setForeground(Color.black);
-    idlb1_2.setBackground(Color.gray);
-    idlb1_2.setOpaque(true);
-    p1_2.add(lb1_2);
-    p1_2.add(idlb1_2, BorderLayout.SOUTH);
-    p1.add(p1_2);
-
-    p1_3 = new JPanel(new BorderLayout());
-    JLabel lb1_3 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_3 = new JLabel("안녕");
-    idlb1_3.setFont(맑은고딕);
-    idlb1_3.setHorizontalAlignment(0);
-    idlb1_3.setForeground(Color.black);
-    idlb1_3.setBackground(Color.gray);
-    idlb1_3.setOpaque(true);
-    p1_3.add(lb1_3);
-    p1_3.add(idlb1_3, BorderLayout.SOUTH);
-    p1.add(p1_3);
-
-
-    p1_4 = new JPanel(new BorderLayout());
-    JLabel lb1_4 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_4 = new JLabel("안녕");
-    idlb1_4.setFont(맑은고딕);
-    idlb1_4.setHorizontalAlignment(0);
-    idlb1_4.setForeground(Color.black);
-    idlb1_4.setBackground(Color.gray);
-    idlb1_4.setOpaque(true);
-    p1_4.add(lb1_4);
-    p1_4.add(idlb1_4, BorderLayout.SOUTH);
-    p1.add(p1_4);
-
-    p2 = new JPanel();
-    p2.setPreferredSize(new Dimension(150, 600));
-    p2.setLayout(new GridLayout(4, 1));
-
-
-    p2_1 = new JPanel(new BorderLayout());
-    JLabel lb2_1 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_1 = new JLabel("안녕");
-    idlb2_1.setFont(맑은고딕);
-    idlb2_1.setHorizontalAlignment(0);
-    idlb2_1.setForeground(Color.black);
-    idlb2_1.setBackground(Color.gray);
-    idlb2_1.setOpaque(true);
-    p2_1.add(lb2_1);
-    p2_1.add(idlb2_1, BorderLayout.SOUTH);
-    p2.add(p2_1);
-
-    p2_2 = new JPanel(new BorderLayout());
-    JLabel lb2_2 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_2 = new JLabel("안녕");
-    idlb2_2.setFont(맑은고딕);
-    idlb2_2.setHorizontalAlignment(0);
-    idlb2_2.setForeground(Color.black);
-    idlb2_2.setBackground(Color.gray);
-    idlb2_2.setOpaque(true);
-    p2_2.add(lb2_2);
-    p2_2.add(idlb2_2, BorderLayout.SOUTH);
-    p2.add(p2_2);
-
-    p2_3 = new JPanel(new BorderLayout());
-    JLabel lb2_3 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_3 = new JLabel("안녕");
-    idlb2_3.setFont(맑은고딕);
-    idlb2_3.setHorizontalAlignment(0);
-    idlb2_3.setForeground(Color.black);
-    idlb2_3.setBackground(Color.gray);
-    idlb2_3.setOpaque(true);
-    p2_3.add(lb2_3);
-    p2_3.add(idlb2_3, BorderLayout.SOUTH);
-    p2.add(p2_3);
-
-    p2_4 = new JPanel(new BorderLayout());
-    JLabel lb2_4 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_4 = new JLabel("안녕");
-    idlb2_4.setFont(맑은고딕);
-    idlb2_4.setHorizontalAlignment(0);
-    idlb2_4.setForeground(Color.black);
-    idlb2_4.setBackground(Color.gray);
-    idlb2_4.setOpaque(true);
-    p2_4.add(lb2_4);
-    p2_4.add(idlb2_4, BorderLayout.SOUTH);
-    p2.add(p2_4);                                                                     //사이드패널
-
-    taP = new JPanel(new BorderLayout());
-    taP.add(ta, BorderLayout.CENTER);
-    sp = new JScrollPane(ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    taP.add(sp);                                                                      //ta패널
-
-    ta.setLineWrap(true);
-    cp.add(taP, BorderLayout.CENTER);
-    cp.add(p1, BorderLayout.WEST);
-    cp.add(p2, BorderLayout.EAST);
-
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource().equals(endBtn)) {
-      dispose();
-      ui.reopen();
-    }
-  }
-
-
-  void setUi() {
-    setVisible(true);
-    setTitle(ip + ", " + port + "에서 채팅중..");
-    setSize(900, 750);
-    setLocationRelativeTo(null);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-  }
-
-  void human() {
-    setTitle(ip + ", " + port + "에서 게임중..");
-    String topic = null;                                                            //주제 받아오는 코딩
-    topicTf.setText("주제: " + topic);
-
-  }
-
-  void liar() {
-    setTitle(ip + ", " + port + "에서 게임중..");
-    topicTf.setText("당신은 라이어입니다.");
-
-  }
-
-  public class RoundedButton extends JButton {
-    public RoundedButton() {
-      super();
-      decorate();
-    }
-
-    public RoundedButton(String text) {
-      super(text);
-      decorate();
-    }
-
-    public RoundedButton(Action action) {
-      super(action);
-      decorate();
-    }
-
-    public RoundedButton(Icon icon) {
-      super(icon);
-      decorate();
-    }
-
-    public RoundedButton(String text, Icon icon) {
-      super(text, icon);
-      decorate();
-    }
-
-    protected void decorate() {
-      setBorderPainted(false);
-      setOpaque(false);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      Color c = new Color(255, 247, 242); //배경색 결정
-      Color o = new Color(247, 99, 12); //글자색 결정
-      int width = getWidth();
-      int height = getHeight();
-      Graphics2D graphics = (Graphics2D) g;
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      if (getModel().isArmed()) {
-        graphics.setColor(c.darker());
-      } else if (getModel().isRollover()) {
-        graphics.setColor(c.brighter());
-      } else {
-        graphics.setColor(c);
+      s = new Socket(cui.ip, Integer.parseInt(cui.port));
+      is = s.getInputStream();
+      os = s.getOutputStream();
+      dis = new DataInputStream(is);
+      dos = new DataOutputStream(os);
+      System.out.println("서버와 접속 완료...");
+      listenTh.start();
+      speakTh.start();
+    }  catch (IOException ie) {
+    } finally {
+      try {
+        if (s != null) s.close();
+      } catch (IOException ie) {
       }
-      graphics.fillRoundRect(0, 0, width, height, 10, 10);
-      FontMetrics fontMetrics = graphics.getFontMetrics();
-      Rectangle stringBounds = fontMetrics.getStringBounds(this.getText(), graphics).getBounds();
-      int textX = (width - stringBounds.width) / 2;
-      int textY = (height - stringBounds.height) / 2 + fontMetrics.getAscent();
-      graphics.setColor(o);
-      graphics.setFont(getFont());
-      graphics.drawString(getText(), textX, textY);
-      graphics.dispose();
-      super.paintComponent(g);
     }
   }
+
+  void listen() {
+        DataInputStream dis = null;
+        try {
+              dis = new DataInputStream(is);
+              String msg = "";
+              while (true) {
+                    msg = dis.readUTF();
+                    System.out.println(id+">> " + msg);
+              }
+        } catch (IOException ie) {
+          ie.printStackTrace();
+              System.out.println("Server 퇴장(다운됨!).. 2초 후에 종료하겠습니다!!");
+              try {
+                    Thread.sleep(2000);
+              } catch (InterruptedException ie2) {
+              }
+              System.exit(0);
+        } finally {
+              try {
+                    if (dis != null) dis.close();
+                    if (is != null) is.close();
+              } catch (IOException ie) {
+              }
+        }
+  }
+
+  public void run() {
+    if(currentThread().equals(speakTh)){speak();}
+    if(currentThread().equals(listenTh)){listen();}
+
+  }
+
+  void speak() {
+    DataOutputStream dos = new DataOutputStream(os);
+    try {
+      while (true) {
+        String line = br.readLine();
+        dos.writeUTF(line);
+        dos.flush();
+      }
+    } catch (IOException ie) {
+      System.out.println("speak() ie: " + ie);
+    } finally {
+      try {
+        if (dos != null) dos.close();
+        if (os != null) os.close();
+      } catch (IOException ie) {
+      }
+    }
+  }
+
+  void readerFileName() {
+    try {
+      line = brkey.readLine();//불러온 파일을 라인에 한줄씩 입력
+      if (line != null) {
+        line = line.trim();
+      }
+      if (line.length() == 0) {
+        line = filename;
+      }
+      fr = new FileReader(line);
+    } catch (FileNotFoundException fe) {
+      System.out.println("파일을 찾지못했습니다.");
+      readerFileName();
+    } catch (IOException ie) {
+    }
+  }
+
+  void inputIp() {
+    try {
+      System.out.println("IP: " + ip);
+      String ip = br.readLine();
+      if (ip != null) ip = ip.trim();
+      if (ip.length() == 0) ;
+    } catch (IOException ie) {
+    }
+  }
+      /*void opening() {
+            try {
+                  Thread.sleep(3000);
+                  System.out.println("라이어 세계에 오신 것을 환영합니다...\n게임을 시작하시려면 플레이버튼을 눌려주세요.");
+            } catch (InterruptedException ie) {
+            }
+            try {
+                  while (br.readLine() == null){
+                  }
+            }catch(IOException ie){}
+      }*/
+
+  void chat() {
+
+  }
+
+
+  void liarSelect() {
+
+  }
+
+  void setPlayButton(Boolean playButton) {
+
+  }
+
+  void playerNumSelect() {
+    while (true) {
+      if (playNum == 1 || playNum < 0) {
+        System.out.println("게임을 진행할 인원수가 작습니다.\n 다시 선택하세요...");
+        playerNumSelect();
+      } else if (playNum > 1) {
+        try {
+          Thread.sleep(1000);
+          System.out.println("게임을 진행합니다...");
+        } catch (InterruptedException ie) {
+        }
+      }
+    }
+  }
+
 }

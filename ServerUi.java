@@ -23,11 +23,8 @@ class ServerUi extends JFrame implements ActionListener {
     JComboBox idBox;
     String idArray[] = {"¤±","¤Ð"};
 
-    Font ¸¼Àº°íµñ = new Font("¸¼Àº °íµñ", Font.BOLD, 20);
 
-    ServerUi(LoginUi ui, JFrame frame,LiarServer ls) {
-        this.ui = ui;
-        this.frame = frame;
+    ServerUi(LiarServer ls) {
         this.ls=ls;
         init();
         setUi();
