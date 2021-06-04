@@ -11,7 +11,6 @@ class LiarServer extends Thread {
     Vector<OneClientModul> v = new Vector<OneClientModul>();
     OneClientModul ocm;
     LoginUi ui;
-    JFrame frame;
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     Thread thread = new Thread(new Runnable() {
         @Override
@@ -26,9 +25,6 @@ class LiarServer extends Thread {
                     if (v.size() != 0) {
                         OneClientModul ocm = v.get(0);
                         ocm.broadcast(" 관리자>> " + msg);
-                        if (ocm.chatId.equals(msg)) {
-                            ocm.cut();
-                        }
                     } else {
                         pln("클라이언트가 아무도 없음");
                     }
@@ -38,16 +34,15 @@ class LiarServer extends Thread {
         }
     });
 
-    LiarServer(LoginUi ui, JFrame frame) {
+    LiarServer(LoginUi ui) {
         try {
             this.ui = ui;
-            this.frame = frame;
             this.portN = ui.port;
             port = Integer.parseInt(portN);
             ss = new ServerSocket(port);
             thread.start();
             start();
-            new ServerUi(ui, frame, this);
+            new ServerUi(this);
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
