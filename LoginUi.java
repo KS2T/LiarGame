@@ -1,32 +1,33 @@
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import sun.rmi.runtime.Log;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 import java.awt.geom.RoundRectangle2D;
 import java.io.*;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.net.*;
-import java.util.zip.CheckedOutputStream;
-
 import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
 
 class LoginUi extends JFrame implements ActionListener {
 
   String id, ip, port;
-  JTextField idTf, ipTf, portTf;
-  JLabel idLb, ipLb, portLb, imgLb;
   RoundedButton serverBtn, clientBTn, endBtn;
-  Container cp;
-  JPanel tfP, btnP, radioP, inputP, p1;
+  JPanel  p1;
   ImageIcon titleIcon, backIcon;
+  File file = new File(  "BMEuljiro10yearslater.ttf" );
+  Font font;
+
+  {
+    try {
+      font = Font.createFont( Font.TRUETYPE_FONT, file );
+    } catch (FontFormatException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   Thread th = new Thread(new Runnable() {
     @Override
     public void run() {
@@ -38,7 +39,6 @@ class LoginUi extends JFrame implements ActionListener {
       serverBtn.setVisible(true);
       clientBTn.setVisible(true);
       endBtn.setVisible(true);
-      interrupted();
     }
   });
 
@@ -216,10 +216,16 @@ class LoginDialog extends JDialog implements ActionListener { //    버튼 클릭시 
       ui.id = idTf.getText().trim();
       ui.ip = ipTf.getText().trim();
       ui.port = portTf.getText().trim();
-      dispose();
-      frame.dispose();
-      new ClientUi(ui);
+      Boolean chk = check();
+      if (chk == true) {
+        dispose();
+        frame.dispose();
+        new Client(ui);
+      }else{
+        portTf.setText("");
+      }
     } else if (e.getSource().equals(noBtn)) {
+      idTf.setText("");
       ipTf.setText("");
       portTf.setText("");
       dispose();
@@ -227,12 +233,19 @@ class LoginDialog extends JDialog implements ActionListener { //    버튼 클릭시 
   }
 
   boolean check() {
-    int i;
-    if (1 > (i = Integer.parseInt(ui.port)) | (i = Integer.parseInt(ui.port)) > 65535) {
-      JOptionPane.showMessageDialog(null, "정확한 포트를 입력해주세요.");
+    try {
+
+
+      int i = Integer.parseInt(ui.port);
+      if (1 > i | i > 65535) {
+        JOptionPane.showMessageDialog(null, "정확한 포트를 입력해주세요.");
+        return false;
+      }
+      return true;
+    }catch (NumberFormatException ne){
+      JOptionPane.showMessageDialog(null,"정확한 포트를 입력해주세요");
       return false;
     }
-    return true;
   }
 
 } //로그인 다이얼로그
@@ -270,7 +283,7 @@ class RoundedButton extends JButton {                                           
 
     setContentAreaFilled(false);
     setBorderPainted(false);
-    setFont(new Font("Thoma", Font.BOLD, 12));
+    setFont(new Font("맑은 고딕",Font.BOLD,16));
     setForeground(Color.WHITE);
     setFocusable(false);
   }
@@ -286,7 +299,7 @@ class RoundedButton extends JButton {                                           
       setForeground(Color.GRAY);
       GP = new GradientPaint(0, 0, new Color(192, 192, 192), 0, h, new Color(192, 192, 192), true);
     } else {
-      setForeground(Color.WHITE);
+      setForeground(Color.white);
       if (model.isRollover()) {
         GP = new GradientPaint(0, 0, rollOverColor, 0, h, rollOverColor, true);
       } else {
