@@ -1,5 +1,8 @@
 
 import javax.print.DocFlavor;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
@@ -27,26 +30,31 @@ class Client extends Thread {
     DataInputStream dis;
     DataOutputStream dos;
     Socket s;
-    ClientUi cui;
+    LoginUi ui;
     ArrayList<String> topicNames = new ArrayList<String>();
     Thread listenTh = new Thread(this);
-    Thread speakTh = new Thread(this);
 
 
-    Client(ClientUi cui) {
-        this.cui = cui;
-        this.ip = cui.ip;
-        this.port = cui.port;
-        this.id = cui.id;
+    Client(LoginUi ui) {
+        this.ui = ui;
+        this.ip = ui.ip;
+        this.port = Integer.parseInt(ui.port);
+        this.id = ui.id;
         try {
             s = new Socket(ip, port);
             is = s.getInputStream();
             os = s.getOutputStream();
             dis = new DataInputStream(is);
             dos = new DataOutputStream(os);
+            dos.writeUTF(id);
+            dos.flush();
             listenTh.start();
-            speakTh.start();
+            new ClientUi(this);
         } catch (IOException ie) {
+            System.out.println("Client ie: " + ie);
+            JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
+            ui.reopen();
+            ui.clientBTn.doClick();
         }
     }
 
@@ -64,13 +72,7 @@ class Client extends Thread {
                 System.out.println(msg);
             }
         } catch (IOException ie) {
-            ie.printStackTrace();
-            System.out.println("Server와 연결이 끊겼습니다.. 2초후 종료합니다.");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ie2) {
-            }
-            System.exit(0);
+            System.out.println("listen ie: " + ie);
         } finally {
             try {
                 if (dis != null) dis.close();
@@ -81,33 +83,18 @@ class Client extends Thread {
     }
 
     public void run() {
-        if (currentThread().equals(speakTh)) {
-            speak();
-        }
         if (currentThread().equals(listenTh)) {
             listen();
         }
 
     }
 
-    void speak() {
-        DataOutputStream dos = new DataOutputStream(os);
+    void speak(String str) {                                                //todo Client Ui에서 chatTf리스너로 작동 구현할것
         try {
-            dos.writeUTF(id);
+            dos.writeUTF(id + ">> " + str);
             dos.flush();
-            while (true) {
-                String line = br.readLine();
-                dos.writeUTF(id + ">> " + line);
-                dos.flush();
-            }
         } catch (IOException ie) {
             System.out.println("speak() ie: " + ie);
-        } finally {
-            try {
-                if (dos != null) dos.close();
-                if (os != null) os.close();
-            } catch (IOException ie) {
-            }
         }
     }
 

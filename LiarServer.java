@@ -12,27 +12,8 @@ class LiarServer extends Thread {
     OneClientModul ocm;
     LoginUi ui;
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    Thread thread = new Thread(new Runnable() {
-        @Override
-
-        public void run() {
-
-            String msg = "";
-            try {
-                while (true) {
-                    msg = br.readLine();
-                    msg = msg.trim();
-                    if (v.size() != 0) {
-                        OneClientModul ocm = v.get(0);
-                        ocm.broadcast("관리자>> " + msg);
-                    } else {
-                        pln("서버에 인원이 없습니다.");
-                    }
-                }
-            } catch (IOException ie) {
-            }
-        }
-    });
+    Thread spkThread = new Thread(this);
+    Thread serverThread = new Thread(this);
 
     LiarServer(LoginUi ui) {
         try {
@@ -40,32 +21,66 @@ class LiarServer extends Thread {
             this.portN = ui.port;
             port = Integer.parseInt(portN);
             ss = new ServerSocket(port);
-            thread.start();
-            start();
+            spkThread.start();
+            serverThread.start();
             new ServerUi(this);
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
     }
 
+    void cut() {
+        String banId = "밴";
+        for (OneClientModul ocm : v) {
+            if (ocm.chatId.equals(banId)) {
+                v.remove(ocm);
+                ocm.closeAll();
+                ocm.broadcast(ocm.chatId + "님이 강퇴당했습니다..");
+                break;
+            }
+        }
+    }
+
     @Override
     public void run() {
-
-        try {
-            while (true) {
-                s = ss.accept();
-                ocm = new OneClientModul(this);
-                v.add(ocm);
-                ocm.start();
-            }
-        } catch (IOException ie) {
-            pln(port + "번 포트 사용중.");
-        } finally {
+        if (currentThread().equals(serverThread)) {
             try {
-                if (ss != null) ss.close();
+                while (true) {
+                    s = ss.accept();
+                    ocm = new OneClientModul(this);
+                    v.add(ocm);
+                    ocm.start();
+                }
+            } catch (IOException ie) {
+                pln(port + "번 포트 사용중.");
+            } finally {
+                try {
+                    if (ss != null) ss.close();
+                } catch (IOException ie) {
+                }
+            }
+        }
+
+        else if (currentThread().equals(spkThread)) {
+            String msg;
+            try {
+                while (true) {
+                    msg = br.readLine();
+                    msg = msg.trim();
+                    msg = "관리자 >> " + msg;
+                    if (v.size() != 0) {
+                        OneClientModul ocm = v.get(0);
+                        ocm.broadcast(msg);
+                        System.out.println(msg);
+                    } else {
+                        pln("서버에 인원이 없습니다.");
+                    }
+                }
             } catch (IOException ie) {
             }
         }
+
+
     }
 
 
@@ -130,17 +145,6 @@ class OneClientModul extends Thread {                                           
                 ocm.dos.flush();
             }
         } catch (IOException ie) {
-        }
-    }
-
-    void cut() {
-        String banId = "밴";
-        for (OneClientModul ocm : ls.v) {
-            if (ocm.chatId.equals(banId)) {
-                ls.v.remove(ocm);
-                broadcast(ocm.chatId + "님이 강퇴당했습니다..");
-                break;
-            }
         }
     }
 
