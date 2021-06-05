@@ -24,9 +24,9 @@ class LiarServer extends Thread {
                     msg = msg.trim();
                     if (v.size() != 0) {
                         OneClientModul ocm = v.get(0);
-                        ocm.broadcast(" 관리자>> " + msg);
+                        ocm.broadcast("관리자>> " + msg);
                     } else {
-                        pln("클라이언트가 아무도 없음");
+                        pln("서버에 인원이 없습니다.");
                     }
                 }
             } catch (IOException ie) {
@@ -59,7 +59,7 @@ class LiarServer extends Thread {
                 ocm.start();
             }
         } catch (IOException ie) {
-            pln(port + "사용중");
+            pln(port + "번 포트 사용중.");
         } finally {
             try {
                 if (ss != null) ss.close();
@@ -76,9 +76,9 @@ class LiarServer extends Thread {
     void p(String str) {
         System.out.print(str);
     }
-}
+}                                                                                               //라이어서버
 
-class OneClientModul extends Thread {
+class OneClientModul extends Thread {                                                           //원클모듈
     LiarServer ls;
     Socket s;
     InputStream is;
@@ -107,8 +107,8 @@ class OneClientModul extends Thread {
         String msg = "";
         try {
             chatId = dis.readUTF();
-            broadcast(chatId + " 님이 참가하였습니다. (현재 참가자: " + ls.v.size() + "명)");
-            ls.pln(chatId + " 님이 참가하였습니다. (현재 참가자: " + ls.v.size() + "명)");
+            broadcast(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
+            ls.pln(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
             while (true) {
                 msg = dis.readUTF();
                 broadcast(msg);
@@ -116,8 +116,8 @@ class OneClientModul extends Thread {
             }
         } catch (IOException ie) {
             ls.v.remove(this);
-            broadcast(chatId + " 님이 퇴장하였습니다. (현재인원: " + ls.v.size() + "명)");
-            ls.pln(chatId + " 님이 퇴장하였습니다. (현재인원: " + ls.v.size() + "명)");
+            broadcast(chatId + " 님이 퇴장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
+            ls.pln(chatId + " 님이 퇴장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
         } finally {
             closeAll();
         }
@@ -138,7 +138,7 @@ class OneClientModul extends Thread {
         for (OneClientModul ocm : ls.v) {
             if (ocm.chatId.equals(banId)) {
                 ls.v.remove(ocm);
-                broadcast(ocm.chatId + "님이 강퇴당했습니다.");
+                broadcast(ocm.chatId + "님이 강퇴당했습니다..");
                 break;
             }
         }
