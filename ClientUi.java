@@ -9,17 +9,17 @@ import java.io.IOException;
 import java.net.Socket;
 
 class ClientUi extends JFrame implements ActionListener {
-  String ip, port, id;
-  int portN = 0;
+  String ip, portString, id;
+  int port = 0;
   Socket s;
   Client c;
   LoginUi ui;
-  ////////////////////////////////////// â†“ì±„íŒ…í”„ë ˆì„ ë©¤ë²„
+  ////////////////////////////////////// Å¬¶óÀ¯¾ÆÀÌ ¸â¹ö¡é
   JTextArea ta = new JTextArea() {
     public void paintComponent(final Graphics g) {
       ImageIcon imageIcon = new ImageIcon("taBack.png");
       Rectangle rect = getVisibleRect();
-      g.drawImage(imageIcon.getImage(), rect.x, rect.y, rect.width, rect.height,null);
+      g.drawImage(imageIcon.getImage(), rect.x, rect.y, rect.width, rect.height, null);
       setOpaque(false);
       super.paintComponent(g);
     }
@@ -29,21 +29,24 @@ class ClientUi extends JFrame implements ActionListener {
   JComboBox idCb;
   JScrollPane sp;
   JPanel tfP, p1, p1_1, p1_2, p1_3, p1_4, p2, p2_1, p2_2, p2_3, p2_4, taP, northP, endP, chatP;
-  RoundedButton endBtn = new RoundedButton("ë‚˜ê°€ê¸°");
+  RoundedButton endBtn = new RoundedButton("¼­¹ö ³ª°¡±â");
   Container cp;
-  Font f = new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 20);
-  Font f2 = new Font("ë§‘ì€ ê³ ë”•", Font.PLAIN, 20);
+  Font f = new Font("¸¼Àº °íµñ", Font.BOLD, 20);
+  Font f2 = new Font("¸¼Àº °íµñ", Font.PLAIN, 20);
 
   ClientUi(LoginUi ui) {
     try {
       this.ui = ui;
-      id = ui.id.trim();
-      ip = ui.ip.trim();
+      id = ui.id;
+      ip = ui.ip;
+      portString = ui.port;
+      port= Integer.parseInt(portString);
 
       System.out.println(ui.ip + ui.port + ui.id);
 
       init();
       setUi();
+      new Client(this);
     } catch (Exception e) {
 
     }
@@ -69,7 +72,7 @@ class ClientUi extends JFrame implements ActionListener {
     selectP.add(timeTf, BorderLayout.WEST);
     tfP.add(topicP);
     tfP.add(selectP);
-    tfP.add(idCb);                                      //ìƒë‹¨ ìƒ‰
+    tfP.add(idCb);                                      //ÄŞº¸¹Ú½º Ãß°¡
     northP.add(tfP, BorderLayout.SOUTH);
     cp.add(northP, BorderLayout.NORTH);                                      //northP
 
@@ -83,13 +86,13 @@ class ClientUi extends JFrame implements ActionListener {
     chatP.add(endBtn);
     cp.add(chatP, BorderLayout.SOUTH);                                               //chatTf
 
-    p1 = new JPanel();                                                                   //ì‚¬ì´ë“œ íŒ¨ë„
+    p1 = new JPanel();                                                                   //»çÀÌµåÆĞ³Î
     p1.setPreferredSize(new Dimension(150, 600));
     p1.setLayout(new GridLayout(4, 1));
 
     p1_1 = new JPanel(new BorderLayout());
     JLabel lb1_1 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_1 = new JLabel("ì•ˆë…•");
+    JLabel idlb1_1 = new JLabel("¾ÆÀÌµğ");
     idlb1_1.setFont(f);
     idlb1_1.setHorizontalAlignment(0);
     idlb1_1.setForeground(Color.black);
@@ -101,7 +104,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p1_2 = new JPanel(new BorderLayout());
     JLabel lb1_2 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_2 = new JLabel("ì•ˆë…•");
+    JLabel idlb1_2 = new JLabel("¾ÆÀÌµğ");
     idlb1_2.setFont(f);
     idlb1_2.setHorizontalAlignment(0);
     idlb1_2.setForeground(Color.black);
@@ -113,7 +116,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p1_3 = new JPanel(new BorderLayout());
     JLabel lb1_3 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_3 = new JLabel("ì•ˆë…•");
+    JLabel idlb1_3 = new JLabel("¾ÆÀÌµğ");
     idlb1_3.setFont(f);
     idlb1_3.setHorizontalAlignment(0);
     idlb1_3.setForeground(Color.black);
@@ -126,7 +129,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p1_4 = new JPanel(new BorderLayout());
     JLabel lb1_4 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb1_4 = new JLabel("ì•ˆë…•");
+    JLabel idlb1_4 = new JLabel("¾ÆÀÌµğ");
     idlb1_4.setFont(f);
     idlb1_4.setHorizontalAlignment(0);
     idlb1_4.setForeground(Color.black);
@@ -143,7 +146,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p2_1 = new JPanel(new BorderLayout());
     JLabel lb2_1 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_1 = new JLabel("ì•ˆë…•");
+    JLabel idlb2_1 = new JLabel("¾ÆÀÌµğ");
     idlb2_1.setFont(f);
     idlb2_1.setHorizontalAlignment(0);
     idlb2_1.setForeground(Color.black);
@@ -155,7 +158,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p2_2 = new JPanel(new BorderLayout());
     JLabel lb2_2 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_2 = new JLabel("ì•ˆë…•");
+    JLabel idlb2_2 = new JLabel("¾ÆÀÌµğ");
     idlb2_2.setFont(f);
     idlb2_2.setHorizontalAlignment(0);
     idlb2_2.setForeground(Color.black);
@@ -167,7 +170,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p2_3 = new JPanel(new BorderLayout());
     JLabel lb2_3 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_3 = new JLabel("ì•ˆë…•");
+    JLabel idlb2_3 = new JLabel("¾ÆÀÌµğ");
     idlb2_3.setFont(f);
     idlb2_3.setHorizontalAlignment(0);
     idlb2_3.setForeground(Color.black);
@@ -179,7 +182,7 @@ class ClientUi extends JFrame implements ActionListener {
 
     p2_4 = new JPanel(new BorderLayout());
     JLabel lb2_4 = new JLabel(new ImageIcon("buddy.jpg"));
-    JLabel idlb2_4 = new JLabel("ì•ˆë…•");
+    JLabel idlb2_4 = new JLabel("¾ÆÀÌµğ");
     idlb2_4.setFont(f);
     idlb2_4.setHorizontalAlignment(0);
     idlb2_4.setForeground(Color.black);
@@ -187,12 +190,12 @@ class ClientUi extends JFrame implements ActionListener {
     idlb2_4.setOpaque(true);
     p2_4.add(lb2_4);
     p2_4.add(idlb2_4, BorderLayout.SOUTH);
-    p2.add(p2_4);                                                                     //ì‚¬ì´ë“œíŒ¨ë„
+    p2.add(p2_4);                                                                     //»çÀÌµåÆĞ³Î ³¡
 
     taP = new JPanel(new BorderLayout());
     taP.add(ta, BorderLayout.CENTER);
     sp = new JScrollPane(ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    taP.add(sp);//taíŒ¨ë„
+    taP.add(sp);                                                                            //taÆĞ³Î
 
 
     ta.setLineWrap(true);
@@ -213,7 +216,7 @@ class ClientUi extends JFrame implements ActionListener {
 
   void setUi() {
     setVisible(true);
-    setTitle(ip + ", " + port + "ì—ì„œ ì±„íŒ…ì¤‘..");
+    setTitle(ip + ", " + port + "¿¡¼­ Ã¤ÆÃÁß..");
     setSize(900, 750);
     setResizable(false);
     setLocationRelativeTo(null);
@@ -221,74 +224,15 @@ class ClientUi extends JFrame implements ActionListener {
   }
 
   void human() {
-    setTitle(ip + ", " + port + "ì—ì„œ ê²Œì„ì¤‘..");
-    String topic = null;                                                            //ì£¼ì œ ë°›ì•„ì˜¤ëŠ” ì½”ë”©
-    topicTf.setText("ì£¼ì œ: " + topic);
+    setTitle(ip + ", " + port + "¿¡¼­ °ÔÀÓÁß..");
+    String topic = null;                                                            //
+    topicTf.setText("ÁÖÁ¦: " + topic);
 
   }
 
   void liar() {
-    setTitle(ip + ", " + port + "ì—ì„œ ê²Œì„ì¤‘..");
-    topicTf.setText("ë‹¹ì‹ ì€ ë¼ì´ì–´ì…ë‹ˆë‹¤.");
+    setTitle(ip + ", " + port + "¿¡¼­ °ÔÀÓÁß..");
+    topicTf.setText("´ç½ÅÀº ¶óÀÌ¾îÀÔ´Ï´Ù.");
 
-  }
-
-  public class RoundedButton extends JButton {
-    public RoundedButton() {
-      super();
-      decorate();
-    }
-
-    public RoundedButton(String text) {
-      super(text);
-      decorate();
-    }
-
-    public RoundedButton(Action action) {
-      super(action);
-      decorate();
-    }
-
-    public RoundedButton(Icon icon) {
-      super(icon);
-      decorate();
-    }
-
-    public RoundedButton(String text, Icon icon) {
-      super(text, icon);
-      decorate();
-    }
-
-    protected void decorate() {
-      setBorderPainted(false);
-      setOpaque(false);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      Color c = new Color(150, 150, 150); //ë°°ê²½ìƒ‰ ê²°ì •
-      Color o = new Color(60, 60, 60); //ê¸€ììƒ‰ ê²°ì •
-      int width = getWidth();
-      int height = getHeight();
-      Graphics2D graphics = (Graphics2D) g;
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      if (getModel().isArmed()) {
-        graphics.setColor(c.darker());
-      } else if (getModel().isRollover()) {
-        graphics.setColor(c.brighter());
-      } else {
-        graphics.setColor(c);
-      }
-      graphics.fillRoundRect(0, 0, width, height, 10, 10);
-      FontMetrics fontMetrics = graphics.getFontMetrics();
-      Rectangle stringBounds = fontMetrics.getStringBounds(this.getText(), graphics).getBounds();
-      int textX = (width - stringBounds.width) / 2;
-      int textY = (height - stringBounds.height) / 2 + fontMetrics.getAscent();
-      graphics.setColor(o);
-      graphics.setFont(getFont());
-      graphics.drawString(getText(), textX, textY);
-      graphics.dispose();
-      super.paintComponent(g);
-    }
   }
 }
