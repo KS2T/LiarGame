@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+// import java.time.LocalTime;
 import java.util.*;
 
 public class GameManager {
@@ -8,17 +9,10 @@ public class GameManager {
     String lair;
     Scanner sc;
     ArrayList<String> topicList;
-    List<String> humanList;
+    List<String> playerList = new Vector<>();
 
 
     GameManager(){
-
-        humanList = new Vector<>();
-        humanList.add("까치");
-        humanList.add("집오리");
-        humanList.add("가마우지");
-        humanList.add("고니");
-        humanList.add("기러기");
 
    }
 
@@ -46,23 +40,31 @@ public class GameManager {
     public String setLair() {
 
         Random lairSelector = new Random();
-        int humanListIndex = lairSelector.nextInt(humanList.size());
-        lair = humanList.get(humanListIndex);
+        int listIndex = lairSelector.nextInt(playerList.size());
+        lair = playerList.get(listIndex);
         return lair;
 
     }
 
-    public void vote() {
+    /* public void setTimeLimit() {
 
-        int i;
-        for(i = 0; i < humanList.size(); i++){
-            System.out.println(humanList.get(i);
+        LocalTime startTime = LocalTime.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalTime endTime = startTime.plusSeconds(5L);
+        while (endTime.isAfter(currentTime)) {
+            currentTime = LocalTime.now();
         }
-        
 
+    } */
+
+    public void vote(){
+        
     }
 
     public static void main(String[] args){
 
+        GameManager gm = new GameManager();
+
     }
+
 }
