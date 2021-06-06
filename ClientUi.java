@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-class ClientUi extends JFrame implements ActionListener, Runnable {
+class ClientUi extends JFrame  {
     Client c;
+    LoginUi ui;
     String id, ip, port;
     ////////////////////////////////////// 클라유아이 멤버↓
     JTextArea ta = new JTextArea() {
@@ -32,23 +33,19 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
     Font f = new Font("맑은 고딕", Font.BOLD, 20);
     Font f2 = new Font("맑은 고딕", Font.PLAIN, 20);
     int nop;
-    Vector<JPanel> pv = new Vector<>();
-    Thread listenTh = new Thread(this);
-    Thread spkTh = new Thread(this);
+    Vector<PanelUi> pv = new Vector<>();
+    PanelUi pui;
 
-    ClientUi(Client c) {
+    ClientUi(LoginUi ui) {
         try {
-            this.c = c;
-            this.id = c.id;
-            this.ip = c.ip;
-            this.port = String.valueOf(c.port);
-            this.nop = c.nop;
-            System.out.println(nop);
-            System.out.println(ip + port + id);
+            this.ui = ui;
+            this.id = ui.id;
+            this.ip = ui.ip;
+            this.port = String.valueOf(ui.port);
+            System.out.println("Cui의: "+ip + port + id);
             init();
             setUi();
-            listenTh.start();
-            addAction();                                            //액션리스너 삽입
+            new Client(this);                               //액션리스너 삽입
         } catch (Exception e) {
 
         }
@@ -64,45 +61,6 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    void addAction() {
-        endBtn.addActionListener(this);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if (e.getSource().equals(endBtn)) {
-            try {
-                c.s.close();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-            dispose();
-            c.ui.reopen();
-        }
-
-    }
-
-    @Override
-    public void run() {
-        if (Thread.currentThread().equals(listenTh)) {
-            while (true) {
-                String msg = null;
-                msg = c.listen();
-                if (msg != null) {
-                    if (msg.startsWith("topic:")) {
-                        System.out.println(msg);
-                        topicTf.setText(msg.substring(6));
-                    } else {
-                        System.out.println(msg);
-                        ta.append(msg + "\n");
-                    }
-                }
-            }
-        } else if (Thread.currentThread().equals(spkTh)) {
-            // c.speak();                                           todo c.speak(); 이용해서 말하기 구현
-        }
-    }
 
     void human() {                                                                          //todo 휴먼일경우
         setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
@@ -117,27 +75,6 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
 
     }
 
-    void panelUi() {
-        for (int i = 0; i < 8; i++) {
-            JPanel panel = new JPanel(new BorderLayout());
-            JLabel imgLb = new JLabel(new ImageIcon("buddy.jpg"));
-            JLabel idLb = new JLabel("아이디");
-            idLb.setFont(f);
-            idLb.setHorizontalAlignment(0);
-            idLb.setForeground(Color.black);
-            idLb.setBackground(Color.gray);
-            idLb.setOpaque(true);
-            panel.add(imgLb);
-            panel.add(idLb, BorderLayout.SOUTH);
-            pv.add(panel);
-
-            if (pv.size() < 4) {
-                p1.add(panel);
-            } else if (pv.size() >= 4) {
-                p2.add(panel);
-            }
-        }
-    }
 
     void init() {
 
@@ -178,7 +115,7 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
         p2 = new JPanel();
         p2.setPreferredSize(new Dimension(150, 600));
         p2.setLayout(new GridLayout(4, 1));
-        panelUi();
+        new PanelUi(this);
         //사이드패널 끝
 
         taP = new JPanel(new BorderLayout());
@@ -194,4 +131,35 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
 
     }
 
+}
+class PanelUi{
+    JPanel panel ;
+    JLabel imgLb ;
+    JLabel idLb ;
+    Font f = new Font("맑은 고딕", Font.BOLD, 20);
+    ClientUi cui;
+     PanelUi(ClientUi cui) {
+         this.cui = cui;
+        for (int i = 0; i < 8; i++) {
+            panel = new JPanel(new BorderLayout());
+            imgLb= new JLabel(new ImageIcon("buddy.jpg"));
+            imgLb.setName(String.valueOf(i)+"imgLb");
+            idLb= new JLabel("아이디");
+            idLb.setName(String.valueOf(i)+"idLb");
+            idLb.setFont(f);
+            idLb.setHorizontalAlignment(0);
+            idLb.setForeground(Color.black);
+            idLb.setBackground(Color.gray);
+            idLb.setOpaque(true);
+            panel.add(imgLb);
+            panel.add(idLb, BorderLayout.SOUTH);
+
+            if (cui.pv.size() < 4) {
+                cui.p1.add(panel);
+            } else if (cui.pv.size() >= 4) {
+                cui.p2.add(panel);
+            }
+            cui.pv.add(this);
+        }
+    }
 }

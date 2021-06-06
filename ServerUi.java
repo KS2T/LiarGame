@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -22,22 +23,17 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
     Container cp;
     JButton startBtn, banBtn, endBtn, clearBtn;
     JComboBox idBox;
-    String idArray[] = {"ㅁ", "ㅠ"};
     String msg;
     Thread gmThread = new Thread(this);
 
-    ServerUi(LiarServer ls) {
-        this.ls = ls;
+    ServerUi(LoginUi ui) {
+        this.ui = ui;
+        this.port=ui.port;
         init();
         setUi();
+        new LiarServer(this);
     }
 
-    @Override
-    public void run() {
-         if (Thread.currentThread().equals(gmThread)){
-            new GameManager(ls);
-        }
-    }
     void init() {
         cp = getContentPane();
         cp.setLayout(new BorderLayout());                                                           //cp
@@ -60,13 +56,13 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
         btnP = new JPanel(new GridLayout(1, 4));
         startBtn = new JButton("게임 시작!");
         banBtn = new JButton("강퇴");
-        idBox = new JComboBox(idArray);
+        idBox = new JComboBox();
         clearBtn = new JButton("채팅 지우기");
         btnP.add(startBtn);
         btnP.add(banBtn);
         btnP.add(idBox);
         btnP.add(clearBtn);
-        chatTf = new JTextField("sp");
+        chatTf = new JTextField("");
 
         chatP.add(chatTf, BorderLayout.CENTER);
         chatP.add(btnP, BorderLayout.SOUTH);
@@ -78,7 +74,7 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
 
     void setUi() {
         setVisible(true);
-        setTitle(ip + ", " + port + "에서 채팅중..");
+        setTitle( port + "에서 채팅중..");
         setSize(700, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,4 +120,6 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
             gmThread.start();
         }
     }
+
+
 }

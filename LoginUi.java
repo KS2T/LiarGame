@@ -211,7 +211,7 @@ class LoginDialog extends JDialog implements ActionListener { //    버튼 클릭시 
             if (chk = true) {
                 dispose();
                 frame.dispose();
-                new LiarServer(ui);
+                new ServerUi(ui);
             }
         } else if (e.getSource().equals(okBtn) & title.equals("서버 입장하기")) {
             ui.id = idTf.getText().trim();
@@ -221,7 +221,7 @@ class LoginDialog extends JDialog implements ActionListener { //    버튼 클릭시 
             if (chk == true) {
                 dispose();
                 frame.dispose();
-                new Client(ui);
+                new ClientUi(ui);
             } else {
                 portTf.setText("");
             }

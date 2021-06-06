@@ -1,9 +1,11 @@
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-class LiarServer extends Thread {
+class LiarServer extends Thread implements ActionListener {
     ServerSocket ss;
     Socket s;
     int port = 3000;
@@ -12,29 +14,35 @@ class LiarServer extends Thread {
     OneClientModul ocm;
     LoginUi ui;
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    Thread spkThread = new Thread(this);
+    Thread gameThread = new Thread(this);
     Thread serverThread = new Thread(this);
-    LiarServer(LoginUi ui) {
+    ServerUi sui;
+    String msg;
+
+
+    LiarServer(ServerUi sui) {
         try {
-            this.ui = ui;
-            this.portN = ui.port;
+            this.sui = sui;
+            this.portN = sui.ui.port;
             port = Integer.parseInt(portN);
             ss = new ServerSocket(port);
-            spkThread.start();
-            serverThread.start();
-            new ServerUi(this);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+            sui.setTitle("ip: " + InetAddress.getLocalHost().getHostAddress() + ", port: " + port + " 서버관리자");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        serverThread.start();
+        this.sui = sui;
+        this.s = sui.s;
+        act();
     }
 
-    void cut() {
-        String banId = "밴";
+    void kick() {
+        String banId = String.valueOf(sui.idBox.getSelectedItem());
         for (OneClientModul ocm : v) {
             if (ocm.chatId.equals(banId)) {
+                ocm.broadcast(ocm.chatId + "님이 강퇴당했습니다..");
                 v.remove(ocm);
                 ocm.closeAll();
-                ocm.broadcast(ocm.chatId + "님이 강퇴당했습니다..");
                 break;
             }
         }
@@ -49,17 +57,18 @@ class LiarServer extends Thread {
                     System.out.println(s);
                     OutputStream os = s.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(os);
-                    if (v.size()==8){
+                    if (v.size() == 8) {
                         System.out.println(os);
                         System.out.println(dos);
                         dos.writeUTF("false");
                         System.out.println("false");
-                    }else if (v.size()<8){
+                    } else if (v.size() < 8) {
                         dos.writeUTF("true");
                         dos.write(v.size());
-                    ocm = new OneClientModul(this);
-                    v.add(ocm);
-                    ocm.start();
+                        ocm = new OneClientModul(this);
+                        sui.idBox.addItem(ocm.chatId);
+                        v.add(ocm);
+                        ocm.start();
                     }
                 }
             } catch (IOException ie) {
@@ -71,29 +80,34 @@ class LiarServer extends Thread {
                 }
             }
         }
-
-        else if (currentThread().equals(spkThread)) {
-            String msg;
-            try {
-                while (true) {
-                    msg = br.readLine();
-                    msg = msg.trim();
-                    msg = "관리자 >> " + msg;
-                    if (v.size() != 0) {
-                        OneClientModul ocm = v.get(0);
-                        ocm.broadcast(msg);
-                        System.out.println(msg);
-                    } else {
-                        pln("서버에 인원이 없습니다.");
-                    }
-                }
-            } catch (IOException ie) {
-            }
-        }
-
-
+if(currentThread().)
     }
 
+    void act() {
+        Action enter = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                msg = sui.chatTf.getText();
+                msg = msg.trim();
+                msg = "관리자 >> " + msg;
+                sui.chatTf.setText(null);
+                if (v.size() != 0) {
+                    ocm.broadcast(msg);
+                } else {
+                    sui.ta.append("서버에 인원이 없습니다.\n");
+                }
+            }
+        };
+        sui.chatTf.addActionListener(enter);
+        sui.banBtn.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(sui.banBtn)) {
+            kick();
+        }
+    }
 
     void pln(String str) {
         System.out.println(str);
@@ -103,6 +117,7 @@ class LiarServer extends Thread {
         System.out.print(str);
     }
 }                                                                                               //라이어서버
+
 
 class OneClientModul extends Thread {                                                           //원클모듈
     LiarServer ls;
@@ -121,6 +136,7 @@ class OneClientModul extends Thread {                                           
             os = s.getOutputStream();
             dis = new DataInputStream(is);
             dos = new DataOutputStream(os);
+            chatId = dis.readUTF();
         } catch (IOException ie) {
         }
     }
@@ -132,18 +148,14 @@ class OneClientModul extends Thread {                                           
     void listen() {
         String msg = "";
         try {
-            chatId = dis.readUTF();
             broadcast(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
-            ls.pln(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
             while (true) {
                 msg = dis.readUTF();
                 broadcast(msg);
-                ls.pln(msg);
             }
         } catch (IOException ie) {
             ls.v.remove(this);
             broadcast(chatId + " 님이 퇴장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
-            ls.pln(chatId + " 님이 퇴장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
         } finally {
             closeAll();
         }
@@ -154,6 +166,7 @@ class OneClientModul extends Thread {                                           
             for (OneClientModul ocm : ls.v) {
                 ocm.dos.writeUTF(msg);
                 ocm.dos.flush();
+                ls.sui.ta.append(msg + "\n");
             }
         } catch (IOException ie) {
         }

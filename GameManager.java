@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-
+import java.util.Timer;
 public class GameManager {
 
     String topic;
@@ -71,4 +71,26 @@ public class GameManager {
 
     }
 
+    public void printTimer() {
+
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + (5 * 60 * 1000);
+
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask(){
+
+            @Override
+            public void run() {
+
+                long currentTime = System.currentTimeMillis();
+                long leftTime = endTime - currentTime;
+                long leftMinute = (leftTime / (60 * 1000) );
+                long leftSeconds = (leftTime / 1000) % 60;
+
+                System.out.println(leftMinute + ":" + leftSeconds);
+            }
+
+        };
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+    }
 }

@@ -12,11 +12,12 @@ import java.io.*;
 import java.lang.*;
 
 
-class Client {
+class Client implements Runnable,ActionListener {
     String name = "";
     String type;
     String topic[];
     Boolean playButton;
+    JFrame frame;
     int playNum;
     String filename = "";
     FileReader fr = null;
@@ -33,14 +34,17 @@ class Client {
     LoginUi ui;
     int nop;
     ArrayList<String> topicNames = new ArrayList<String>();
-
-
-    Client(LoginUi ui) {
-        this.ui = ui;
-        this.ip = ui.ip;
-        this.port = Integer.parseInt(ui.port);
-        this.id = ui.id;
+    String msg;
+    ClientUi cui;
+    Thread listenTh = new Thread(this);
+    Client(ClientUi cui) {
+        this.cui = cui;
+        this.ui =cui.ui;
+        this.ip = cui.ip;
+        this.port = Integer.parseInt(cui.port);
+        this.id = cui.id;
         try {
+            System.out.println(id+ip+port);
             s = new Socket(ip, port);
             is = s.getInputStream();
             os = s.getOutputStream();
@@ -48,23 +52,24 @@ class Client {
             dos = new DataOutputStream(os);
             System.out.println("연결");
             String ent = dis.readUTF();
+            act();
+            listenTh.start();
             if (ent.equals("false")) {
                 System.out.println("false");
                 JOptionPane.showMessageDialog(null, "해당 서버의 인원이 가득 찼습니다", "인원 초과", 0);
-                ui.reopen();
-                ui.clientBTn.doClick();
+                cui.ui.reopen();
+                cui.ui.clientBTn.doClick();
             } else {
                 System.out.println("낫 폴스");
                 nop = dis.read();
                 dos.writeUTF(id);
                 dos.flush();
-                new ClientUi(this);
             }
         } catch (IOException ie) {
             System.out.println("Client ie: " + ie);
             JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
-            ui.reopen();
-            ui.clientBTn.doClick();
+            cui.ui.reopen();
+            cui.ui.clientBTn.doClick();
         }
     }
 
@@ -72,21 +77,60 @@ class Client {
         String msg = "";
         try {
             msg = dis.readUTF();
+            System.out.println(msg);
             if (msg.startsWith(id + ">>") & !msg.startsWith(id + " ")) {
                 msg = msg.replaceFirst(id, "나 ");
                 return msg;
             } else if (msg.startsWith("topic:")) {
                 msg = "topic:" + msg.substring(6);
                 return msg;
-            }else{
-            System.out.println(msg);
-            return msg;}
+            } else if (msg.startsWith(id + "님이 강퇴")) {
+                s.close();
+                JOptionPane.showMessageDialog(null, "관리자에 의해 강퇴당하셨습니다.", "강퇴", 0);
+                cui.dispose();
+                ui.reopen();
+                return "exit";
+            } else {
+                System.out.println(msg);
+                return msg;
+            }
         } catch (IOException ie) {
-            System.out.println("listen ie: " + ie);
+            return "exit";
         }
 
-        return null;
     }
+
+    void act() {
+        Action enter = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                msg = cui.chatTf.getText();
+                msg = msg.trim();
+                speak(msg);
+                cui.chatTf.setText(null);
+            }
+        };
+        cui.chatTf.addActionListener(enter);
+        cui.endBtn.addActionListener(this);
+
+    }
+
+
+    @Override
+    public void actionPerformed (ActionEvent e){
+
+        if (e.getSource().equals(cui.endBtn)) {
+            try {
+                s.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            cui.dispose();
+            ui.reopen();
+        }
+    }
+
+
 
 
     void speak(String str) {                                                //todo Client Ui에서 chatTf리스너로 작동 구현할것
@@ -95,6 +139,25 @@ class Client {
             dos.flush();
         } catch (IOException ie) {
             System.out.println("speak() ie: " + ie);
+        }
+    }
+
+    @Override
+    public void run() {
+        if (Thread.currentThread().equals(listenTh)) {
+            while (true) {
+                String msg = null;
+                msg = listen();
+                if (msg != null) {
+                    if (msg.startsWith("topic:")) {
+                        cui.topicTf.setText(msg.substring(6));
+                    } else if (msg.equals("exit")) {
+                        break;
+                    } else {
+                        cui.ta.append(msg + "\n");
+                    }
+                }
+            }
         }
     }
 
