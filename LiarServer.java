@@ -56,6 +56,7 @@ class LiarServer extends Thread {
                         System.out.println("false");
                     }else if (v.size()<8){
                         dos.writeUTF("true");
+                        dos.write(v.size());
                     ocm = new OneClientModul(this);
                     v.add(ocm);
                     ocm.start();

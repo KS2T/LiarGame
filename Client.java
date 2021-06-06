@@ -31,6 +31,7 @@ class Client {
     DataOutputStream dos;
     Socket s;
     LoginUi ui;
+    int nop;
     ArrayList<String> topicNames = new ArrayList<String>();
 
 
@@ -54,6 +55,7 @@ class Client {
                 ui.clientBTn.doClick();
             } else {
                 System.out.println("³´ Æú½º");
+                nop = dis.read();
                 dos.writeUTF(id);
                 dos.flush();
                 new ClientUi(this);

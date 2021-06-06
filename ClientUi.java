@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Vector;
 
 class ClientUi extends JFrame implements ActionListener, Runnable {
     Client c;
@@ -30,7 +31,8 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
     Container cp;
     Font f = new Font("맑은 고딕", Font.BOLD, 20);
     Font f2 = new Font("맑은 고딕", Font.PLAIN, 20);
-
+    int nop;
+    Vector<JPanel> pv = new Vector<>();
     Thread listenTh = new Thread(this);
     Thread spkTh = new Thread(this);
 
@@ -40,6 +42,8 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
             this.id = c.id;
             this.ip = c.ip;
             this.port = String.valueOf(c.port);
+            this.nop = c.nop;
+            System.out.println(nop);
             System.out.println(ip + port + id);
             init();
             setUi();
@@ -113,6 +117,28 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
 
     }
 
+    void panelUi() {
+        for (int i = 0; i < 8; i++) {
+            JPanel panel = new JPanel(new BorderLayout());
+            JLabel imgLb = new JLabel(new ImageIcon("buddy.jpg"));
+            JLabel idLb = new JLabel("아이디");
+            idLb.setFont(f);
+            idLb.setHorizontalAlignment(0);
+            idLb.setForeground(Color.black);
+            idLb.setBackground(Color.gray);
+            idLb.setOpaque(true);
+            panel.add(imgLb);
+            panel.add(idLb, BorderLayout.SOUTH);
+            pv.add(panel);
+
+            if (pv.size() < 4) {
+                p1.add(panel);
+            } else if (pv.size() >= 4) {
+                p2.add(panel);
+            }
+        }
+    }
+
     void init() {
 
         cp = getContentPane();
@@ -149,108 +175,11 @@ class ClientUi extends JFrame implements ActionListener, Runnable {
         p1 = new JPanel();                                                                   //사이드패널
         p1.setPreferredSize(new Dimension(150, 600));
         p1.setLayout(new GridLayout(4, 1));
-
-        p1_1 = new JPanel(new BorderLayout());
-        JLabel lb1_1 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb1_1 = new JLabel("아이디");
-        idlb1_1.setFont(f);
-        idlb1_1.setHorizontalAlignment(0);
-        idlb1_1.setForeground(Color.black);
-        idlb1_1.setBackground(Color.gray);
-        idlb1_1.setOpaque(true);
-        p1_1.add(lb1_1);
-        p1_1.add(idlb1_1, BorderLayout.SOUTH);
-        p1.add(p1_1);
-
-        p1_2 = new JPanel(new BorderLayout());
-        JLabel lb1_2 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb1_2 = new JLabel("아이디");
-        idlb1_2.setFont(f);
-        idlb1_2.setHorizontalAlignment(0);
-        idlb1_2.setForeground(Color.black);
-        idlb1_2.setBackground(Color.gray);
-        idlb1_2.setOpaque(true);
-        p1_2.add(lb1_2);
-        p1_2.add(idlb1_2, BorderLayout.SOUTH);
-        p1.add(p1_2);
-
-        p1_3 = new JPanel(new BorderLayout());
-        JLabel lb1_3 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb1_3 = new JLabel("아이디");
-        idlb1_3.setFont(f);
-        idlb1_3.setHorizontalAlignment(0);
-        idlb1_3.setForeground(Color.black);
-        idlb1_3.setBackground(Color.gray);
-        idlb1_3.setOpaque(true);
-        p1_3.add(lb1_3);
-        p1_3.add(idlb1_3, BorderLayout.SOUTH);
-        p1.add(p1_3);
-
-
-        p1_4 = new JPanel(new BorderLayout());
-        JLabel lb1_4 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb1_4 = new JLabel("아이디");
-        idlb1_4.setFont(f);
-        idlb1_4.setHorizontalAlignment(0);
-        idlb1_4.setForeground(Color.black);
-        idlb1_4.setBackground(Color.gray);
-        idlb1_4.setOpaque(true);
-        p1_4.add(lb1_4);
-        p1_4.add(idlb1_4, BorderLayout.SOUTH);
-        p1.add(p1_4);
-
         p2 = new JPanel();
         p2.setPreferredSize(new Dimension(150, 600));
         p2.setLayout(new GridLayout(4, 1));
-
-
-        p2_1 = new JPanel(new BorderLayout());
-        JLabel lb2_1 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb2_1 = new JLabel("아이디");
-        idlb2_1.setFont(f);
-        idlb2_1.setHorizontalAlignment(0);
-        idlb2_1.setForeground(Color.black);
-        idlb2_1.setBackground(Color.gray);
-        idlb2_1.setOpaque(true);
-        p2_1.add(lb2_1);
-        p2_1.add(idlb2_1, BorderLayout.SOUTH);
-        p2.add(p2_1);
-
-        p2_2 = new JPanel(new BorderLayout());
-        JLabel lb2_2 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb2_2 = new JLabel("아이디");
-        idlb2_2.setFont(f);
-        idlb2_2.setHorizontalAlignment(0);
-        idlb2_2.setForeground(Color.black);
-        idlb2_2.setBackground(Color.gray);
-        idlb2_2.setOpaque(true);
-        p2_2.add(lb2_2);
-        p2_2.add(idlb2_2, BorderLayout.SOUTH);
-        p2.add(p2_2);
-
-        p2_3 = new JPanel(new BorderLayout());
-        JLabel lb2_3 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb2_3 = new JLabel("아이디");
-        idlb2_3.setFont(f);
-        idlb2_3.setHorizontalAlignment(0);
-        idlb2_3.setForeground(Color.black);
-        idlb2_3.setBackground(Color.gray);
-        idlb2_3.setOpaque(true);
-        p2_3.add(lb2_3);
-        p2_3.add(idlb2_3, BorderLayout.SOUTH);
-        p2.add(p2_3);
-
-        p2_4 = new JPanel(new BorderLayout());
-        JLabel lb2_4 = new JLabel(new ImageIcon("buddy.jpg"));
-        JLabel idlb2_4 = new JLabel("아이디");
-        idlb2_4.setFont(f);
-        idlb2_4.setHorizontalAlignment(0);
-        idlb2_4.setForeground(Color.black);
-        idlb2_4.setBackground(Color.gray);
-        idlb2_4.setOpaque(true);
-        p2_4.add(lb2_4);
-        p2_4.add(idlb2_4, BorderLayout.SOUTH);
-        p2.add(p2_4);                                                                     //사이드패널 끝
+        panelUi();
+        //사이드패널 끝
 
         taP = new JPanel(new BorderLayout());
         taP.add(ta, BorderLayout.CENTER);
