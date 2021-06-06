@@ -1,48 +1,58 @@
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-// import java.time.LocalTime;
 import java.util.*;
 
 public class GameManager {
 
     String topic;
-    String lair;
+    String liar;
     Scanner sc;
     ArrayList<String> topicList;
-    List<String> playerList = new Vector<>();
+    List<String> playerList = new ArrayList();
+    LiarServer ls;
+    String player[] = {"asd", "sss", "ffff", "asdwww"};
 
+    GameManager(LiarServer ls) {
+        this.ls = ls;
+        for (OneClientModul ocm : ls.v) {
+            playerList.add(ocm.chatId);
+        }
+        setTopic();
+        setLair();
+        System.out.println(liar);
+        System.out.println(topic);
+        for (OneClientModul ocm : ls.v) {
+            ocm.broadcast("topic:" + topic);
+            ocm.broadcast("liar:");
+        }
+    }
 
-    GameManager(){
+    public void setTopic() {
 
-   }
-
-    public String setTopic(){
-
-        File topicListFile = new File("C:\\Users\\ì„±í•˜\\Desktop\\ìƒˆ.txt");
-        try{
+        File topicListFile = new File("ÁÖÁ¦.txt");
+        try {
             sc = new Scanner(topicListFile);
-        }catch (FileNotFoundException e){
-            System.out.println("íŒŒì¼ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+        } catch (FileNotFoundException e) {
+            System.out.println("ÆÄÀÏÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
         }
 
         topicList = new ArrayList<>();
-        while (sc.hasNextLine()){
+        while (sc.hasNextLine()) {
             topicList.add(sc.nextLine());
         }
 
         Random topicGenerator = new Random();
         int topicListIndex = topicGenerator.nextInt(topicList.size());
         topic = topicList.get(topicListIndex);
-        return topic;
 
     }
 
-    public String setLair() {
+    public void setLair() {
 
         Random lairSelector = new Random();
         int listIndex = lairSelector.nextInt(playerList.size());
-        lair = playerList.get(listIndex);
-        return lair;
+        liar = playerList.get(listIndex);
 
     }
 
@@ -57,13 +67,7 @@ public class GameManager {
 
     } */
 
-    public void vote(){
-        
-    }
-
-    public static void main(String[] args){
-
-        GameManager gm = new GameManager();
+    public void vote() {
 
     }
 

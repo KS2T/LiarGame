@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
 
-class ClientUi extends JFrame implements ActionListener {
+class ClientUi extends JFrame implements ActionListener, Runnable {
     Client c;
     String id, ip, port;
     ////////////////////////////////////// 클라유아이 멤버↓
@@ -31,19 +31,86 @@ class ClientUi extends JFrame implements ActionListener {
     Font f = new Font("맑은 고딕", Font.BOLD, 20);
     Font f2 = new Font("맑은 고딕", Font.PLAIN, 20);
 
+    Thread listenTh = new Thread(this);
+    Thread spkTh = new Thread(this);
+
     ClientUi(Client c) {
         try {
             this.c = c;
-            this.id=c.id;
-            this.ip=c.ip;
+            this.id = c.id;
+            this.ip = c.ip;
             this.port = String.valueOf(c.port);
             System.out.println(ip + port + id);
             init();
             setUi();
+            listenTh.start();
             addAction();                                            //액션리스너 삽입
         } catch (Exception e) {
 
         }
+    }
+
+
+    void setUi() {
+        setVisible(true);
+        setTitle(id + "(으)로 채팅중..(ip: " + ip + ", port: " + port + ")");
+        setSize(900, 750);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    void addAction() {
+        endBtn.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource().equals(endBtn)) {
+            try {
+                c.s.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            dispose();
+            c.ui.reopen();
+        }
+
+    }
+
+    @Override
+    public void run() {
+        if (Thread.currentThread().equals(listenTh)) {
+            while (true) {
+                String msg = null;
+                msg = c.listen();
+                if (msg != null) {
+                    if (msg.startsWith("topic:")) {
+                        System.out.println(msg);
+                        topicTf.setText(msg.substring(6));
+                    } else {
+                        System.out.println(msg);
+                        ta.append(msg + "\n");
+                    }
+                }
+            }
+        } else if (Thread.currentThread().equals(spkTh)) {
+            // c.speak();                                           todo c.speak(); 이용해서 말하기 구현
+        }
+    }
+
+    void human() {                                                                          //todo 휴먼일경우
+        setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
+        String topic = null;                                                            //
+        topicTf.setText("주제: " + topic);
+
+    }
+
+    void liar() {                                                                           //todo 라이어일경우
+        setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
+        topicTf.setText("당신은 라이어입니다.");
+
     }
 
     void init() {
@@ -198,44 +265,4 @@ class ClientUi extends JFrame implements ActionListener {
 
     }
 
-
-    void setUi() {
-        setVisible(true);
-        setTitle(id+"로 채팅중..(ip: "+ip +", port: "+ port + ")" );
-        setSize(900, 750);
-        setResizable(false);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
-    void addAction(){
-        endBtn.addActionListener(this);
-    }
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if (e.getSource().equals(endBtn)) {
-            try {
-                c.s.close();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-            dispose();
-            c.ui.reopen();
-        }
-
-    }
-
-    void human() {                                                                          //todo 휴먼일경우
-        setTitle(id+"로 게임중..(ip: "+ip +", port: "+ port + ")" );
-        String topic = null;                                                            //
-        topicTf.setText("주제: " + topic);
-
-    }
-
-    void liar() {                                                                           //todo 라이어일경우
-        setTitle(id+"로 게임중..(ip: "+ip +", port: "+ port + ")" );
-        topicTf.setText("당신은 라이어입니다.");
-
-    }
 }

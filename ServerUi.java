@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class ServerUi extends JFrame implements ActionListener {
+class ServerUi extends JFrame implements ActionListener,Runnable {
     Object o;
     String ip, port, id;
     JFrame frame;
@@ -20,17 +20,24 @@ class ServerUi extends JFrame implements ActionListener {
     JScrollPane sp;
     JPanel tfP, endP, chatP, btnP, p1_3, p1_4, p2, p2_1, p2_2, p2_3, p2_4, taP;
     Container cp;
-    JButton startBtn,banBtn,endBtn,clearBtn;
+    JButton startBtn, banBtn, endBtn, clearBtn;
     JComboBox idBox;
-    String idArray[] = {"ㅁ","ㅠ"};
+    String idArray[] = {"ㅁ", "ㅠ"};
     String msg;
+    Thread gmThread = new Thread(this);
 
     ServerUi(LiarServer ls) {
-        this.ls=ls;
+        this.ls = ls;
         init();
         setUi();
     }
 
+    @Override
+    public void run() {
+         if (Thread.currentThread().equals(gmThread)){
+            new GameManager(ls);
+        }
+    }
     void init() {
         cp = getContentPane();
         cp.setLayout(new BorderLayout());                                                           //cp
@@ -60,14 +67,14 @@ class ServerUi extends JFrame implements ActionListener {
         btnP.add(idBox);
         btnP.add(clearBtn);
         chatTf = new JTextField("sp");
+
         chatP.add(chatTf, BorderLayout.CENTER);
         chatP.add(btnP, BorderLayout.SOUTH);
         cp.add(chatP, BorderLayout.SOUTH);                                                            //chatP
 
-        clearBtn.addActionListener(new ClearBtnListener());
-
+        setUi();
+        act();
     }
-
 
     void setUi() {
         setVisible(true);
@@ -78,24 +85,30 @@ class ServerUi extends JFrame implements ActionListener {
     }
 
 
-    public void sendMessage() {
+    /*public void sendMessage() {
         try {
             String text = chatTf.getText();
-            textArea.append(text + "\n");
+            ta.append(text + "\n");
 
 
-                //프로그램 종료
-                System.exit(0);
-            }else {
+            //프로그램 종료
+            System.exit(0);
+        else{
                 //입력된 메세지가 "/exit"가 아닐 경우( 전송할 메세지인 경우)
                 //클라이언트에게 메세지 전송
                 dos.writeUTF(text);
 
                 //초기화 및 커서요청
-            chatTf.setText("");
-            chatTf.requestFocus();
+                chatTf.setText("");
+                chatTf.requestFocus();
             }
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
+    }*/
+    void act() {
+        endBtn.addActionListener(this);
+        clearBtn.addActionListener(this);
+        startBtn.addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -103,13 +116,12 @@ class ServerUi extends JFrame implements ActionListener {
             dispose();
             ui.reopen();
         }
-    }
-
-    public class ClearBtnListener implements ActionListener{
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(clearBtn)) {
             ta.setText(null);
+        }
+        if (e.getSource().equals(startBtn)) {
+            System.out.println("스타트 클릭");
+            gmThread.start();
         }
     }
 }

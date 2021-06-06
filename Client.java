@@ -12,7 +12,7 @@ import java.io.*;
 import java.lang.*;
 
 
-class Client extends Thread {
+class Client {
     String name = "";
     String type;
     String topic[];
@@ -32,7 +32,6 @@ class Client extends Thread {
     Socket s;
     LoginUi ui;
     ArrayList<String> topicNames = new ArrayList<String>();
-    Thread listenTh = new Thread(this);
 
 
     Client(LoginUi ui) {
@@ -46,10 +45,19 @@ class Client extends Thread {
             os = s.getOutputStream();
             dis = new DataInputStream(is);
             dos = new DataOutputStream(os);
-            dos.writeUTF(id);
-            dos.flush();
-            listenTh.start();
-            new ClientUi(this);
+            System.out.println("연결");
+            String ent = dis.readUTF();
+            if (ent.equals("false")) {
+                System.out.println("false");
+                JOptionPane.showMessageDialog(null, "해당 서버의 인원이 가득 찼습니다", "인원 초과", 0);
+                ui.reopen();
+                ui.clientBTn.doClick();
+            } else {
+                System.out.println("낫 폴스");
+                dos.writeUTF(id);
+                dos.flush();
+                new ClientUi(this);
+            }
         } catch (IOException ie) {
             System.out.println("Client ie: " + ie);
             JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
@@ -58,36 +66,26 @@ class Client extends Thread {
         }
     }
 
-    void listen() {
-        DataInputStream dis = null;
+    String listen() {
+        String msg = "";
         try {
-            dis = new DataInputStream(is);
-            String msg = "";
-            while (true) {
-                msg = dis.readUTF();
-                if (msg.startsWith(id + ">>") & !msg.startsWith(id + " ")) {
-                    msg = msg.replaceFirst(id, "나 ");
-
-                }
-                System.out.println(msg);
-            }
+            msg = dis.readUTF();
+            if (msg.startsWith(id + ">>") & !msg.startsWith(id + " ")) {
+                msg = msg.replaceFirst(id, "나 ");
+                return msg;
+            } else if (msg.startsWith("topic:")) {
+                msg = "topic:" + msg.substring(6);
+                return msg;
+            }else{
+            System.out.println(msg);
+            return msg;}
         } catch (IOException ie) {
             System.out.println("listen ie: " + ie);
-        } finally {
-            try {
-                if (dis != null) dis.close();
-                if (is != null) is.close();
-            } catch (IOException ie) {
-            }
-        }
-    }
-
-    public void run() {
-        if (currentThread().equals(listenTh)) {
-            listen();
         }
 
+        return null;
     }
+
 
     void speak(String str) {                                                //todo Client Ui에서 chatTf리스너로 작동 구현할것
         try {
