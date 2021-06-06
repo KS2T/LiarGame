@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -22,7 +23,7 @@ class ServerUi extends JFrame implements ActionListener {
     JButton startBtn,banBtn,endBtn,clearBtn;
     JComboBox idBox;
     String idArray[] = {"ㅁ","ㅠ"};
-
+    String msg;
 
     ServerUi(LiarServer ls) {
         this.ls=ls;
@@ -37,18 +38,19 @@ class ServerUi extends JFrame implements ActionListener {
         endP = new JPanel(new BorderLayout());
         endBtn = new JButton("종료");
         endBtn.addActionListener(this);
-        endP.add(endBtn,BorderLayout.WEST);
-        cp.add(endP,BorderLayout.NORTH);                                                                //endP
+        endP.add(endBtn, BorderLayout.WEST);
+        cp.add(endP, BorderLayout.NORTH);                                                                //endP
 
         taP = new JPanel(new BorderLayout());
         taP.add(ta, BorderLayout.CENTER);
         sp = new JScrollPane(ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         ta.setLineWrap(true);
         taP.add(sp);
-        cp.add(taP,BorderLayout.CENTER);                                                            //taP
+        ta.setEditable(false);
+        cp.add(taP, BorderLayout.CENTER);                                                            //taP
 
         chatP = new JPanel(new BorderLayout());
-        btnP = new JPanel(new GridLayout(1,4));
+        btnP = new JPanel(new GridLayout(1, 4));
         startBtn = new JButton("게임 시작!");
         banBtn = new JButton("강퇴");
         idBox = new JComboBox(idArray);
@@ -58,12 +60,14 @@ class ServerUi extends JFrame implements ActionListener {
         btnP.add(idBox);
         btnP.add(clearBtn);
         chatTf = new JTextField("sp");
-        chatP.add(chatTf,BorderLayout.CENTER);
-        chatP.add(btnP,BorderLayout.SOUTH);
-        cp.add(chatP,BorderLayout.SOUTH);                                                            //chatP
+        chatP.add(chatTf, BorderLayout.CENTER);
+        chatP.add(btnP, BorderLayout.SOUTH);
+        cp.add(chatP, BorderLayout.SOUTH);                                                            //chatP
 
+        clearBtn.addActionListener(new ClearBtnListener());
 
     }
+
 
     void setUi() {
         setVisible(true);
@@ -73,6 +77,27 @@ class ServerUi extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+
+    public void sendMessage() {
+        try {
+            String text = chatTf.getText();
+            textArea.append(text + "\n");
+
+
+                //프로그램 종료
+                System.exit(0);
+            }else {
+                //입력된 메세지가 "/exit"가 아닐 경우( 전송할 메세지인 경우)
+                //클라이언트에게 메세지 전송
+                dos.writeUTF(text);
+
+                //초기화 및 커서요청
+            chatTf.setText("");
+            chatTf.requestFocus();
+            }
+        } catch (IOException e) {}
+    }
+
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(endBtn)) {
             dispose();
@@ -80,4 +105,11 @@ class ServerUi extends JFrame implements ActionListener {
         }
     }
 
+    public class ClearBtnListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ta.setText(null);
+        }
+    }
 }
