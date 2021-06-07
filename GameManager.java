@@ -38,9 +38,7 @@ public class GameManager {
     }
 
     void unlockAll() {
-        for (Client c : cv) {
-            c.cui.chatTf.setEnabled(true);
-        }
+        gm("올언락");
     }
 
     void oneChat() {
@@ -83,7 +81,7 @@ public class GameManager {
     }
 
     public void vote() {
-
+gm("vote");
     }
 
     void liarSelect() {
@@ -111,7 +109,7 @@ public class GameManager {
             ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: "+liar);
             ls.ocm.broadcast("라이어승리");
         }
-
+        //result();
     }
 
     void gm(String str) {

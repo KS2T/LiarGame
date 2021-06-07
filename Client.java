@@ -1,4 +1,7 @@
 
+import javafx.scene.control.TextInputDialog;
+import jdk.nashorn.internal.scripts.JD;
+
 import javax.print.DocFlavor;
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +15,9 @@ import java.util.*;
 import java.io.*;
 import java.lang.*;
 import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 class Client implements Runnable, ActionListener {
@@ -26,10 +32,43 @@ class Client implements Runnable, ActionListener {
     int nop;
     String lsnMsg, spkMsg;
     ClientUi cui;
+    JFrame frame;
     JOptionPane jop = new JOptionPane();
-    Thread listenTh = new Thread(this);
-    Thread jopTimeTh = new Thread(this);
-
+    Thread listenTh ;
+    Thread chatTimeTh;
+    Action enter = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            spkMsg = cui.chatTf.getText();
+            spkMsg = spkMsg.trim();
+            speak(spkMsg);
+            cui.chatTf.setText(null);
+        }
+    };
+    Action enter2 = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            spkMsg = cui.chatTf.getText();
+            spkMsg = spkMsg.trim();
+            speak(spkMsg);
+            cui.chatTf.setText(null);
+            cui.chatTf.setEnabled(false);
+            cui.chatTf.addActionListener(enter);
+            cui.chatTf.removeActionListener(enter2);
+        }
+    };
+    Action enter3 = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            spkMsg = cui.chatTf.getText();
+            spkMsg = spkMsg.trim();
+            speak("liarTopic" + spkMsg);
+            cui.chatTf.setText(null);
+            cui.chatTf.setEnabled(false);
+            cui.chatTf.addActionListener(enter);
+            cui.chatTf.removeActionListener(enter3);
+        }
+    };
 
     Client(ClientUi cui) {
         this.cui = cui;
@@ -37,6 +76,7 @@ class Client implements Runnable, ActionListener {
         this.ip = cui.ip;
         this.port = Integer.parseInt(cui.port);
         this.id = cui.id;
+        this.frame=cui;
         try {
             System.out.println(id + ip + port);
             s = new Socket(ip, port);
@@ -47,6 +87,7 @@ class Client implements Runnable, ActionListener {
             System.out.println("연결");
             String ent = dis.readUTF();
             act();
+            listenTh= new Thread(this);
             listenTh.start();
             if (ent.equals("false")) {
                 System.out.println("false");
@@ -62,22 +103,12 @@ class Client implements Runnable, ActionListener {
         } catch (IOException ie) {
             System.out.println("Client ie: " + ie);
             JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
+            cui.dispose();
             cui.ui.reopen();
             cui.ui.clientBTn.doClick();
         }
     }
 
-    String listen() {
-        lsnMsg = "";
-        try {
-            lsnMsg = dis.readUTF();
-            System.out.println(lsnMsg);
-            return protocol();
-        } catch (IOException ie) {
-            return "exit";
-        }
-
-    }
 
     String protocol() throws IOException {
         if (lsnMsg.startsWith(id + ">>") & !lsnMsg.startsWith(id + " ")) {
@@ -102,15 +133,7 @@ class Client implements Runnable, ActionListener {
     }
 
     void act() {
-        Action enter = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                spkMsg = cui.chatTf.getText();
-                spkMsg = spkMsg.trim();
-                speak(spkMsg);
-                cui.chatTf.setText(null);
-            }
-        };
+
         cui.chatTf.addActionListener(enter);
         cui.endBtn.addActionListener(this);
 
@@ -134,15 +157,27 @@ class Client implements Runnable, ActionListener {
         } else if (lsnMsg.startsWith("채팅언락")) {
             if (lsnMsg.substring(4).equals(id)) {
                 printTimer(cui.timeTf, 10);
-                String msg = jop.showInputDialog("10초안에 한마디로 주제를 설명해주세요.");
-                speak(msg);
+                cui.ta.append("상단 제한시간안에 제시어에 대해 설명해주세요.\n");
+                cui.chatTf.setEnabled(true);
+                chatTimeTh = new Thread(this);
+                chatTimeTh.start();
+                cui.chatTf.removeActionListener(enter);
+                cui.chatTf.addActionListener(enter2);
             }
         } else if (lsnMsg.startsWith("vote")) {
             if (lsnMsg.substring(4).equals(id)) {
                 printTimer(cui.timeTf, 10);
-                String topic = jop.showInputDialog("10초안에 제시어를 추리하여 입력해주세요.");
-                speak("liarTopic" + topic);
+                cui.ta.append("10초안에 제시어를 추리하여 입력해주세요.\n");
+                cui.chatTf.setEnabled(true);
+                chatTimeTh = new Thread(this);
+                chatTimeTh.start();
+                cui.chatTf.removeActionListener(enter);
+                cui.chatTf.addActionListener(enter3);
             }
+        } else if (lsnMsg.startsWith("올언락")) {
+            cui.chatTf.setEnabled(true);
+            cui.topicTf.setText("");
+            cui.timeTf.setText("");
         }
 
     }
@@ -184,6 +219,8 @@ class Client implements Runnable, ActionListener {
                 msg = listen();
                 if (msg != null) {
                     if (msg.equals("exit")) {
+                        System.out.println("exit");
+                        closeAll();
                         break;
                     } else {
                         cui.ta.append(msg + "\n");
@@ -191,11 +228,28 @@ class Client implements Runnable, ActionListener {
                 }
             }
         }
-        if (Thread.currentThread().equals(jopTimeTh)) {
-
+        if (Thread.currentThread().equals(chatTimeTh)) {
+            try {
+                Thread.currentThread().sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            cui.chatTf.setEnabled(false);
         }
     }
 
+    String listen() {
+        lsnMsg = "";
+        try {
+            lsnMsg = dis.readUTF();
+            System.out.println(lsnMsg);
+            return protocol();
+        } catch (IOException ie) {
+            System.out.println(ie);
+            return "exit";
+        }
+
+    }
     void printTimer(JTextField tf, int i) {
 
         long startTime = System.currentTimeMillis();
@@ -220,6 +274,18 @@ class Client implements Runnable, ActionListener {
 
         };
         timer.scheduleAtFixedRate(timerTask, 0, 1000);
+    }
 
+    void closeAll() {
+        try {
+            if (dis != null) dis.close();
+            if (dos != null) dos.close();
+            if (is != null) is.close();
+            if (os != null) os.close();
+            if (s != null) s.close();
+            cui.dispose();
+            cui.ui.reopen();
+        } catch (IOException ie) {
+        }
     }
 }

@@ -34,7 +34,6 @@ class ServerUi extends JFrame implements ActionListener {
 
         endP = new JPanel(new BorderLayout());
         endBtn = new JButton("Á¾·á");
-        endBtn.addActionListener(this);
         endP.add(endBtn, BorderLayout.WEST);
         cp.add(endP, BorderLayout.NORTH);                                                                //endP
 
@@ -102,10 +101,7 @@ class ServerUi extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(endBtn)) {
-            dispose();
-            ui.reopen();
-        }
+
         if (e.getSource().equals(clearBtn)) {
             ta.setText(null);
         }

@@ -12,8 +12,8 @@ class LiarServer extends Thread implements ActionListener {
     String portN;
     Vector<OneClientModul> v = new Vector<OneClientModul>();
     OneClientModul ocm;
-    Thread gameThread = new Thread(this);
-    Thread serverThread = new Thread(this);
+    Thread gameThread;
+    Thread serverThread;
     ServerUi sui;
     String msg;
     String liarTopic = "10초초과";
@@ -24,19 +24,18 @@ class LiarServer extends Thread implements ActionListener {
             this.portN = sui.ui.port;
             port = Integer.parseInt(portN);
             ss = new ServerSocket(port);
+            System.out.println(ss);
             sui.setTitle("ip: " + InetAddress.getLocalHost().getHostAddress() + ", port: " + port + " 서버관리자");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        serverThread = new Thread(this);
         serverThread.start();
         this.sui = sui;
         this.s = sui.s;
         act();
     }
 
-    LiarServer() {
-
-    }
 
     void kick() {
         String banId = String.valueOf(sui.idBox.getSelectedItem());
@@ -56,12 +55,9 @@ class LiarServer extends Thread implements ActionListener {
             try {
                 while (true) {
                     s = ss.accept();
-                    System.out.println(s);
                     OutputStream os = s.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(os);
                     if (v.size() == 8) {
-                        System.out.println(os);
-                        System.out.println(dos);
                         dos.writeUTF("false");
                         System.out.println("false");
                     } else if (v.size() < 8) {
@@ -78,19 +74,22 @@ class LiarServer extends Thread implements ActionListener {
             } finally {
                 try {
                     if (ss != null) ss.close();
+                    System.out.println("서버다운");
                 } catch (IOException ie) {
                 }
             }
         }
         if (currentThread().equals(gameThread)) {
             try {
-                ocm.broadcast("3초후 게임을 시작합니다.");
-                sleep(1000);
-                ocm.broadcast("2초후 게임을 시작합니다.");
-                sleep(1000);
-                ocm.broadcast("1초후 게임을 시작합니다.");
-                sleep(1000);
-                new GameManager(this);
+                if (v.size() != 0) {
+                    ocm.broadcast("3초후 게임을 시작합니다.");
+                    sleep(1000);
+                    ocm.broadcast("2초후 게임을 시작합니다.");
+                    sleep(1000);
+                    ocm.broadcast("1초후 게임을 시작합니다.");
+                    sleep(1000);
+                    new GameManager(this);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -124,6 +123,7 @@ class LiarServer extends Thread implements ActionListener {
         sui.chatTf.addActionListener(enter);
         sui.banBtn.addActionListener(this);
         sui.startBtn.addActionListener(this);
+        sui.endBtn.addActionListener(this);
     }
 
     @Override
@@ -132,8 +132,13 @@ class LiarServer extends Thread implements ActionListener {
             kick();
         }
         if (e.getSource().equals(sui.startBtn)) {
-            System.out.println("스타트 클릭");
+            gameThread = new Thread(this);
             gameThread.start();
+        }
+        if (e.getSource().equals(sui.endBtn)) {
+
+                System.exit(0);
+
         }
     }
 
@@ -201,8 +206,11 @@ class OneClientModul extends Thread {                                           
             for (OneClientModul ocm : ls.v) {
                 ocm.dos.writeUTF(msg);
                 ocm.dos.flush();
-                ls.sui.ta.append(msg + "\n");
             }
+            if (msg.startsWith("gm")) {
+                msg = msg.substring(2);
+                ls.sui.ta.append(msg + "\n");
+            } else ls.sui.ta.append(msg + "\n");
         } catch (IOException ie) {
         }
     }
