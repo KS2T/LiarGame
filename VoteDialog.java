@@ -1,63 +1,51 @@
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.Vector;
 
-public class VoteDialog extends JDialog {
+class VoteDialog extends JDialog {
 
-    //DefaultListModel<Object> voteListModel;
-    JList<OneClientModul> voteList;
+    JList<String> voteList;
     JFrame frame;
-    String title;
     ClientUi clientUi;
-    //Window window;
+    Client c;
     Container container;
     JPanel vPanel;
-    JTextField vTextField = new JTextField();
     JButton vButton = new JButton("투표하기");
     String result;
-    OneClientModul ocm;
-    Vector<OneClientModul> v = new Vector<OneClientModul>();
-    String name = ocm.chatId;
 
 
-    VoteDialog(JFrame frame, ClientUi clientUi, String title) {
-        super(frame, title, true);
-        this.clientUi = clientUi;
-        this.frame = frame;
-        this.title = title;
+    VoteDialog(Client c) {
+        super(c.cui, "투표하기", true);
+        this.clientUi = c.cui;
+        this.c=c;
+        this.frame = c.frame;
 
         getResult();
         System.out.println(getResult());
     }
 
-    String getResult(){
+    String getResult() {
 
-        voteList = new JList<OneClientModul>(v);
+        voteList = new JList<>(c.idList);
         voteList.setVisibleRowCount(4);
         voteList.setSelectedIndex(0);
-
         container = getContentPane();
         container.getMaximumSize();
         vPanel = new JPanel();
         container.setLayout(new BorderLayout());
         container.add(vPanel, BorderLayout.CENTER);
-        vPanel.setLayout(new GridLayout(3,1));
+        vPanel.setLayout(new GridLayout(2, 1));
         vPanel.add(vButton);
         vPanel.add(voteList);
-        vPanel.add(vTextField);
-        vTextField.setSize(50,50);
         voteList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         voteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         voteList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int index = voteList.getSelectedIndex();
-                result = voteListModel.get(index).toString();
+                result = c.idList.get(index);
             }
         });
         setSize(800, 300);
@@ -68,9 +56,9 @@ public class VoteDialog extends JDialog {
         vButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(e.getSource().equals(vButton)) {
+                if (e.getSource().equals(vButton)) {
                     int index = voteList.getSelectedIndex();
-                    result = voteListModel.get(index).toString();
+                    result = c.idList.get(index);
                 }
             }
         });
