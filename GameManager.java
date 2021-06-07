@@ -81,13 +81,30 @@ public class GameManager {
     }
 
     public void vote() {
-gm("vote");
+        for (OneClientModul ocm : ls.v) {
+            gm("list" + ocm.chatId);
+        }
+        gm("vote");
+        ls.sleepTh(20);
+        System.out.println("쓰레드깸");
     }
 
     void liarSelect() {
-        String voteId = "1";
-        if(liar.equals(voteId)) {
-            gm("vote" + voteId);
+        int i=0;
+        String voteId = "";
+        for (OneClientModul ocm : ls.v){
+            System.out.println(ls.voteList.size());
+            int j = Collections.frequency(ls.voteList,ocm.chatId);
+            System.out.println(j);
+            if (j>i){
+                i=j;
+                voteId = ocm.chatId;
+                System.out.println(i);
+            }
+        }
+        System.out.println("Max: "+voteId);
+        if (liar.equals(voteId)) {
+            gm("votecom" + voteId);
             ls.sleepTh(10);
             String liarTopic;
             liarTopic = ls.liarTopic;
@@ -104,9 +121,9 @@ gm("vote");
                         "\n라이어 패배");
             }
             ls.liarTopic = "10초초과";
-        }else{
+        } else {
             System.out.println("라이어승리");
-            ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: "+liar);
+            ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: " + liar);
             ls.ocm.broadcast("라이어승리");
         }
         //result();

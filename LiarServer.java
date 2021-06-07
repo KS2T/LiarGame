@@ -17,7 +17,8 @@ class LiarServer extends Thread implements ActionListener {
     ServerUi sui;
     String msg;
     String liarTopic = "10초초과";
-
+    ArrayList voteList;
+    int voteNum[];
     LiarServer(ServerUi sui) {
         try {
             this.sui = sui;
@@ -88,6 +89,7 @@ class LiarServer extends Thread implements ActionListener {
                     sleep(1000);
                     ocm.broadcast("1초후 게임을 시작합니다.");
                     sleep(1000);
+                    voteList = new ArrayList();
                     new GameManager(this);
                 }
             } catch (InterruptedException e) {
@@ -180,6 +182,7 @@ class OneClientModul extends Thread {                                           
 
     void listen() {
         String msg = "";
+        int i;
         try {
             broadcast(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
             while (true) {
@@ -189,7 +192,14 @@ class OneClientModul extends Thread {                                           
                         ls.liarTopic = msg.substring(9);
                     }
                     System.out.println(ls.liarTopic);
-                } else {
+                }else if (msg.startsWith("cVote")){
+                    msg =msg.substring(5);
+                    ls.voteList.add(msg);
+                    System.out.println("투표 : "+msg);
+                    if (ls.voteList.size()==ls.v.size()){
+                        ls.gameThread.interrupt();
+                    }
+                }else {
                     broadcast(msg);
                 }
             }

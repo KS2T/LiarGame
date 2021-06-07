@@ -12,12 +12,12 @@ class VoteDialog extends JDialog {
     Client c;
     Container container;
     JPanel vPanel;
-    JButton vButton = new JButton("íˆ¬í‘œí•˜ê¸°");
+    JButton vButton = new JButton("ÅõÇ¥ÇÏ±â");
     String result;
 
 
     VoteDialog(Client c) {
-        super(c.cui, "íˆ¬í‘œí•˜ê¸°", true);
+        super(c.cui, "ÅõÇ¥ÇÏ±â", true);
         this.clientUi = c.cui;
         this.c=c;
         this.frame = c.frame;
@@ -46,19 +46,21 @@ class VoteDialog extends JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 int index = voteList.getSelectedIndex();
                 result = c.idList.get(index);
+                dispose();
             }
         });
         setSize(800, 300);
         setLocation(200, 100);
         setVisible(true);
 
-        vButton.setActionCommand("íˆ¬í‘œí•˜ê¸°");
+        vButton.setActionCommand("ÅõÇ¥ÇÏ±â");
         vButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource().equals(vButton)) {
                     int index = voteList.getSelectedIndex();
                     result = c.idList.get(index);
+                    dispose();
                 }
             }
         });

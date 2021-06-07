@@ -30,6 +30,7 @@ class Client implements Runnable, ActionListener {
     Socket s;
     LoginUi ui;
     int nop;
+    Vector<String> idList = new Vector<>();
     String lsnMsg, spkMsg;
     ClientUi cui;
     JFrame frame;
@@ -164,8 +165,8 @@ class Client implements Runnable, ActionListener {
                 cui.chatTf.removeActionListener(enter);
                 cui.chatTf.addActionListener(enter2);
             }
-        } else if (lsnMsg.startsWith("vote")) {
-            if (lsnMsg.substring(4).equals(id)) {
+        } else if (lsnMsg.startsWith("votecom")) {
+            if (lsnMsg.substring(7).equals(id)) {
                 printTimer(cui.timeTf, 10);
                 cui.ta.append("10초안에 제시어를 추리하여 입력해주세요.\n");
                 cui.chatTf.setEnabled(true);
@@ -178,6 +179,13 @@ class Client implements Runnable, ActionListener {
             cui.chatTf.setEnabled(true);
             cui.topicTf.setText("");
             cui.timeTf.setText("");
+        }else if (lsnMsg.startsWith("list")){
+            idList.add(lsnMsg.substring(4));
+        }else if (lsnMsg.startsWith("vote")){
+            System.out.println("vote입장");
+            String vote = new VoteDialog(this).getResult();
+            System.out.println(vote);
+            speak("cVote"+vote);
         }
 
     }
@@ -202,7 +210,10 @@ class Client implements Runnable, ActionListener {
             if (str.startsWith("liar")) {
                 dos.writeUTF(str);
                 dos.flush();
-            } else {
+            }else if (str.startsWith("cVote")){
+                dos.writeUTF(str);
+                dos.flush();
+            } else{
                 dos.writeUTF(id + ">> " + str);
                 dos.flush();
             }
