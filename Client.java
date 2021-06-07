@@ -11,20 +11,10 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.io.*;
 import java.lang.*;
+import java.util.Timer;
 
 
 class Client implements Runnable, ActionListener {
-    String name = "";
-    String type;
-    String topic[];
-    Boolean playButton;
-    JFrame frame;
-    int playNum;
-    String filename = "";
-    FileReader fr = null;
-    BufferedReader brkey = new BufferedReader(new InputStreamReader(System.in));
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    String line = "";
     String id, ip;
     int port = 0;
     InputStream is;
@@ -34,10 +24,12 @@ class Client implements Runnable, ActionListener {
     Socket s;
     LoginUi ui;
     int nop;
-    ArrayList<String> topicNames = new ArrayList<String>();
     String lsnMsg, spkMsg;
     ClientUi cui;
+    JOptionPane jop = new JOptionPane();
     Thread listenTh = new Thread(this);
+    Thread jopTimeTh = new Thread(this);
+
 
     Client(ClientUi cui) {
         this.cui = cui;
@@ -67,7 +59,6 @@ class Client implements Runnable, ActionListener {
                 dos.writeUTF(id);
                 dos.flush();
             }
-            new GameManager(this);
         } catch (IOException ie) {
             System.out.println("Client ie: " + ie);
             JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
@@ -92,33 +83,17 @@ class Client implements Runnable, ActionListener {
         if (lsnMsg.startsWith(id + ">>") & !lsnMsg.startsWith(id + " ")) {
             lsnMsg = lsnMsg.replaceFirst(id, "나 ");
             return lsnMsg;
-        } else if (lsnMsg.startsWith("liar:")) {
-            if (lsnMsg.substring(5).equals(id)) {
-                cui.topicTf.setText("당신은 라이어입니다");
-            } else {
-                cui.topicTf.setFont(new Font("맑은 고딕", Font.BOLD, 12));
-            }
-            return null;
-        } else if (lsnMsg.startsWith("topic:")) {
-            if (cui.topicTf.getText().equals("당신은 라이어입니다")) {
-                return null;
-            }
-            cui.topicTf.setText(lsnMsg.substring(6));
-            return null;
         } else if (lsnMsg.startsWith(id + "님이 강퇴")) {
             s.close();
             JOptionPane.showMessageDialog(null, "관리자에 의해 강퇴당하셨습니다.", "강퇴", 0);
             cui.dispose();
             ui.reopen();
             return "exit";
-        } else if (lsnMsg.startsWith("채팅락")) {
-            cui.chatTf.setEnabled(false);
-            return null;
-        } else if (lsnMsg.startsWith("채팅언락")) {
-            if (lsnMsg.substring(4).equals(id)) {
-                String msg = JOptionPane.showInputDialog("10초안에 한마디로 주제를 설명해주세요.");
-                speak(msg);
-            }
+        } else if (lsnMsg.startsWith("gm")) {
+            System.out.println(lsnMsg + "gm메세지");
+            lsnMsg = lsnMsg.substring(2);
+            System.out.println(lsnMsg);
+            fromGm(lsnMsg);
             return null;
         } else {
             System.out.println(lsnMsg);
@@ -141,6 +116,36 @@ class Client implements Runnable, ActionListener {
 
     }
 
+    void fromGm(String lsnMsg) {
+
+        if (lsnMsg.startsWith("liar:")) {
+            if (lsnMsg.substring(5).equals(id)) {
+                cui.topicTf.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+                cui.topicTf.setText("당신은 라이어입니다");
+            } else {
+            }
+        } else if (lsnMsg.startsWith("topic:")) {
+            if (cui.topicTf.getText().equals("당신은 라이어입니다")) {
+            } else {
+                cui.topicTf.setText(lsnMsg.substring(6));
+            }
+        } else if (lsnMsg.startsWith("채팅락")) {
+            cui.chatTf.setEnabled(false);
+        } else if (lsnMsg.startsWith("채팅언락")) {
+            if (lsnMsg.substring(4).equals(id)) {
+                printTimer(cui.timeTf, 10);
+                String msg = jop.showInputDialog("10초안에 한마디로 주제를 설명해주세요.");
+                speak(msg);
+            }
+        } else if (lsnMsg.startsWith("vote")) {
+            if (lsnMsg.substring(4).equals(id)) {
+                printTimer(cui.timeTf, 10);
+                String topic = jop.showInputDialog("10초안에 제시어를 추리하여 입력해주세요.");
+                speak("liarTopic" + topic);
+            }
+        }
+
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -159,8 +164,13 @@ class Client implements Runnable, ActionListener {
 
     void speak(String str) {
         try {
-            dos.writeUTF(id + ">> " + str);
-            dos.flush();
+            if (str.startsWith("liar")) {
+                dos.writeUTF(str);
+                dos.flush();
+            } else {
+                dos.writeUTF(id + ">> " + str);
+                dos.flush();
+            }
         } catch (IOException ie) {
             System.out.println("speak() ie: " + ie);
         }
@@ -181,73 +191,35 @@ class Client implements Runnable, ActionListener {
                 }
             }
         }
-    }
+        if (Thread.currentThread().equals(jopTimeTh)) {
 
-
-    void readerFileName() {
-        try {
-            line = brkey.readLine();
-            if (line != null) {
-                line = line.trim();
-            }
-            if (line.length() == 0) {
-                line = filename;
-            }
-            fr = new FileReader(line);
-        } catch (FileNotFoundException fe) {
-            System.out.println("파일을 찾을 수 없습니다..");
-            readerFileName();
-        } catch (IOException ie) {
         }
     }
 
-    void inputIp() {
-        try {
-            System.out.println("IP: " + ip);
-            String ip = br.readLine();
-            if (ip != null) ip = ip.trim();
-            if (ip.length() == 0) ;
-        } catch (IOException ie) {
-        }
-    }
-      /*void opening() {
-            try {
-                  Thread.sleep(3000);
-                  System.out.println("");
-            } catch (InterruptedException ie) {
-            }
-            try {
-                  while (br.readLine() == null){
-                  }
-            }catch(IOException ie){}
-      }*/
+    void printTimer(JTextField tf, int i) {
 
-    void chat() {
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + (i * 1000);
+        final String[] time = new String[1];
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
 
-    }
+            @Override
+            public void run() {
 
-
-    void liarSelect() {
-
-    }
-
-    void setPlayButton(Boolean playButton) {
-
-    }
-
-    void playerNumSelect() {
-        while (true) {
-            if (playNum == 1 || playNum < 0) {
-                System.out.println("...");
-                playerNumSelect();
-            } else if (playNum > 1) {
-                try {
-                    Thread.sleep(1000);
-                    System.out.println("...");
-                } catch (InterruptedException ie) {
+                long currentTime = System.currentTimeMillis();
+                long leftTime = endTime - currentTime;
+                long leftSeconds = (leftTime / 1000) % 60;
+                if (leftSeconds == 0) {
+                    tf.setText("");
+                    timer.cancel();
                 }
-            }
-        }
-    }
+                tf.setText(leftSeconds + "초");
 
+            }
+
+        };
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+
+    }
 }

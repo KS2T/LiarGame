@@ -12,7 +12,6 @@ public class GameManager {
     ArrayList<String> topicList;
     List<String> playerList = new ArrayList();
     LiarServer ls;
-    Client c;
     Vector<Client> cv = new Vector<>();
 
     GameManager(LiarServer ls) {
@@ -25,22 +24,17 @@ public class GameManager {
         System.out.println(liar);
         System.out.println(topic);
         for (OneClientModul ocm : ls.v) {
-            ocm.broadcast("liar:" + liar);
-            ocm.broadcast("topic:" + topic);
+            gm("liar:" + liar);
+            gm("topic:" + topic);
         }
-        printTimer();
         oneChat();
         vote();
+        liarSelect();
         unlockAll();
     }
 
-    GameManager(Client c) {
-        this.c = c;
-        cv.add(c);
-    }
-
     void lockChat() {
-        ls.ocm.broadcast("채팅락");
+        gm("채팅락");
     }
 
     void unlockAll() {
@@ -52,17 +46,11 @@ public class GameManager {
     void oneChat() {
         ls.ocm.broadcast("채팅이 잠깁니다. 10초 후 순서대로 주제를 설명해주세요.");
         lockChat();
-        ls.sleep(10000);
+        ls.sleepTh(10);
         for (int i = 0; i < ls.v.size(); i++) {
             OneClientModul chatOcm = ls.v.get(i);
-            for (Client c : cv) {
-                if (c.id.equals(chatOcm.chatId)) {
-                    printTimer();
-                    break;
-                }
-            }
-            ls.ocm.broadcast("채팅언락" + chatOcm.chatId);
-            ls.sleep(10000);
+            gm("채팅언락" + chatOcm.chatId);
+            ls.sleepTh(10);
         }
     }
 
@@ -94,41 +82,39 @@ public class GameManager {
 
     }
 
-    /* public void setTimeLimit() {
-
-        LocalTime startTime = LocalTime.now();
-        LocalTime currentTime = LocalTime.now();
-        LocalTime endTime = startTime.plusSeconds(5L);
-        while (endTime.isAfter(currentTime)) {
-            currentTime = LocalTime.now();
-        }
-
-    } */
-
     public void vote() {
 
     }
 
-    String printTimer() {
+    void liarSelect() {
+        String voteId = "1";
+        if(liar.equals(voteId)) {
+            gm("vote" + voteId);
+            ls.sleepTh(10);
+            String liarTopic;
+            liarTopic = ls.liarTopic;
+            System.out.println(liarTopic);
+            if (liarTopic.equals(topic)) {
+                System.out.println("라이어승리");
+                ls.ocm.broadcast("라이어승리");
+            } else if (liarTopic.equals("10초초과")) {
+                ls.ocm.broadcast("라이어가 제한시간에 제시어를 입력하지 못했습니다.");
+                ls.ocm.broadcast("라이어패배");
 
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + (10 * 1000);
-        final String[] time = new String[1];
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-
-                long currentTime = System.currentTimeMillis();
-                long leftTime = endTime - currentTime;
-                long leftMinute = (leftTime / (60 * 1000));
-                long leftSeconds = (leftTime / 1000) % 60;
-                time[0] = (leftMinute + ":" + leftSeconds);
+            } else {
+                ls.ocm.broadcast("라이어가 제시어를 맞히지 못햇습니다." +
+                        "\n라이어 패배");
             }
+            ls.liarTopic = "10초초과";
+        }else{
+            System.out.println("라이어승리");
+            ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: "+liar);
+            ls.ocm.broadcast("라이어승리");
+        }
 
-        };
-        timer.scheduleAtFixedRate(timerTask, 0, 1000);
-        return time[0];
+    }
+
+    void gm(String str) {
+        ls.ocm.broadcast("gm" + str);
     }
 }

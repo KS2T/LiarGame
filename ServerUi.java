@@ -8,22 +8,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 class ServerUi extends JFrame implements ActionListener {
-    Object o;
-    String ip, port, id;
-    JFrame frame;
+    String port;
     LoginUi ui;
-    ServerSocket ss;
-    LiarServer ls;
     Socket s;
     /////////////////////////////////////////////¼­¹ö ui¸â¹ö
     JTextArea ta = new JTextArea();
-    JTextField topicTf, selectTf, chatTf;
+    JTextField  chatTf;
     JScrollPane sp;
-    JPanel tfP, endP, chatP, btnP, p1_3, p1_4, p2, p2_1, p2_2, p2_3, p2_4, taP;
+    JPanel  endP, chatP, btnP, taP;
     Container cp;
     JButton startBtn, banBtn, endBtn, clearBtn;
     JComboBox idBox;
-    String msg;
 
     ServerUi(LoginUi ui) {
         this.ui = ui;

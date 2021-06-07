@@ -12,13 +12,11 @@ class LiarServer extends Thread implements ActionListener {
     String portN;
     Vector<OneClientModul> v = new Vector<OneClientModul>();
     OneClientModul ocm;
-    LoginUi ui;
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     Thread gameThread = new Thread(this);
     Thread serverThread = new Thread(this);
     ServerUi sui;
     String msg;
-
+    String liarTopic = "10초초과";
 
     LiarServer(ServerUi sui) {
         try {
@@ -34,6 +32,10 @@ class LiarServer extends Thread implements ActionListener {
         this.sui = sui;
         this.s = sui.s;
         act();
+    }
+
+    LiarServer() {
+
     }
 
     void kick() {
@@ -81,18 +83,29 @@ class LiarServer extends Thread implements ActionListener {
             }
         }
         if (currentThread().equals(gameThread)) {
-            ocm.broadcast("3초후 게임을 시작합니다.");
-            sleep(1000);
-            ocm.broadcast("2초후 게임을 시작합니다.");
-            sleep(1000);
-            ocm.broadcast("1초후 게임을 시작합니다.");
-            sleep(1000);
-            new GameManager(this);
+            try {
+                ocm.broadcast("3초후 게임을 시작합니다.");
+                sleep(1000);
+                ocm.broadcast("2초후 게임을 시작합니다.");
+                sleep(1000);
+                ocm.broadcast("1초후 게임을 시작합니다.");
+                sleep(1000);
+                new GameManager(this);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
-void sleep(int i){
-    if(currentThread().equals(gameThread))sleep(i);
-}
+
+    void sleepTh(int i) {
+        try {
+            currentThread().sleep(i * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     void act() {
         Action enter = new AbstractAction() {
             @Override
@@ -117,7 +130,8 @@ void sleep(int i){
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(sui.banBtn)) {
             kick();
-        }if (e.getSource().equals(sui.startBtn)) {
+        }
+        if (e.getSource().equals(sui.startBtn)) {
             System.out.println("스타트 클릭");
             gameThread.start();
         }
@@ -165,7 +179,14 @@ class OneClientModul extends Thread {                                           
             broadcast(chatId + " 님이 입장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
             while (true) {
                 msg = dis.readUTF();
-                broadcast(msg);
+                if (msg.startsWith("liarTopic")) {
+                    if (msg != null) {
+                        ls.liarTopic = msg.substring(9);
+                    }
+                    System.out.println(ls.liarTopic);
+                } else {
+                    broadcast(msg);
+                }
             }
         } catch (IOException ie) {
             ls.v.remove(this);

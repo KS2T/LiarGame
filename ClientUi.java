@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-class ClientUi extends JFrame  {
-    Client c;
+class ClientUi extends JFrame {
     LoginUi ui;
     String id, ip, port;
     ////////////////////////////////////// Å¬¶óÀ¯¾ÆÀÌ ¸â¹ö¡é
@@ -27,14 +26,12 @@ class ClientUi extends JFrame  {
     String idList[] = {"asd", "assd", "asdasasdasdasdasdd"};
     JComboBox idCb;
     JScrollPane sp;
-    JPanel tfP, p1, p1_1, p1_2, p1_3, p1_4, p2, p2_1, p2_2, p2_3, p2_4, taP, northP, endP, chatP;
+    JPanel tfP, p1, p2, taP, northP, endP, chatP;
     RoundedButton endBtn = new RoundedButton("¼­¹ö ³ª°¡±â");
     Container cp;
     Font f = new Font("¸¼Àº °íµñ", Font.BOLD, 20);
     Font f2 = new Font("¸¼Àº °íµñ", Font.PLAIN, 20);
-    int nop;
     Vector<PanelUi> pv = new Vector<>();
-    PanelUi pui;
 
     ClientUi(LoginUi ui) {
         try {
@@ -42,7 +39,7 @@ class ClientUi extends JFrame  {
             this.id = ui.id;
             this.ip = ui.ip;
             this.port = String.valueOf(ui.port);
-            System.out.println("CuiÀÇ: "+ip + port + id);
+            System.out.println("CuiÀÇ: " + ip + port + id);
             init();
             setUi();
             new Client(this);                               //¾×¼Ç¸®½º³Ê »ðÀÔ
@@ -132,20 +129,22 @@ class ClientUi extends JFrame  {
     }
 
 }
-class PanelUi{
-    JPanel panel ;
-    JLabel imgLb ;
-    JLabel idLb ;
+
+class PanelUi {
+    JPanel panel;
+    JLabel imgLb;
+    JLabel idLb;
     Font f = new Font("¸¼Àº °íµñ", Font.BOLD, 20);
     ClientUi cui;
-     PanelUi(ClientUi cui) {
-         this.cui = cui;
+
+    PanelUi(ClientUi cui) {
+        this.cui = cui;
         for (int i = 0; i < 8; i++) {
             panel = new JPanel(new BorderLayout());
-            imgLb= new JLabel(new ImageIcon("buddy.jpg"));
-            imgLb.setName(String.valueOf(i)+"imgLb");
-            idLb= new JLabel("¾ÆÀÌµð");
-            idLb.setName(String.valueOf(i)+"idLb");
+            imgLb = new JLabel(new ImageIcon("buddy.jpg"));
+            imgLb.setName(String.valueOf(i) + "imgLb");
+            idLb = new JLabel("¾ÆÀÌµð");
+            idLb.setName(String.valueOf(i) + "idLb");
             idLb.setFont(f);
             idLb.setHorizontalAlignment(0);
             idLb.setForeground(Color.black);

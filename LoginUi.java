@@ -14,7 +14,6 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
     String id, ip, port;
     RoundedButton serverBtn, clientBTn, endBtn;
     JPanel p1;
-    ImageIcon titleIcon, backIcon;
     File file = new File("BMEuljiro10yearslater.ttf");
     Font font;
     Thread th = new Thread(this);
