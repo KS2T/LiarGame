@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class ServerUi extends JFrame implements ActionListener,Runnable {
+class ServerUi extends JFrame implements ActionListener {
     Object o;
     String ip, port, id;
     JFrame frame;
@@ -24,7 +24,6 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
     JButton startBtn, banBtn, endBtn, clearBtn;
     JComboBox idBox;
     String msg;
-    Thread gmThread = new Thread(this);
 
     ServerUi(LoginUi ui) {
         this.ui = ui;
@@ -115,10 +114,7 @@ class ServerUi extends JFrame implements ActionListener,Runnable {
         if (e.getSource().equals(clearBtn)) {
             ta.setText(null);
         }
-        if (e.getSource().equals(startBtn)) {
-            System.out.println("스타트 클릭");
-            gmThread.start();
-        }
+
     }
 
 

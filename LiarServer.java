@@ -80,9 +80,19 @@ class LiarServer extends Thread implements ActionListener {
                 }
             }
         }
-if(currentThread().)
+        if (currentThread().equals(gameThread)) {
+            ocm.broadcast("3초후 게임을 시작합니다.");
+            sleep(1000);
+            ocm.broadcast("2초후 게임을 시작합니다.");
+            sleep(1000);
+            ocm.broadcast("1초후 게임을 시작합니다.");
+            sleep(1000);
+            new GameManager(this);
+        }
     }
-
+void sleep(int i){
+    if(currentThread().equals(gameThread))sleep(i);
+}
     void act() {
         Action enter = new AbstractAction() {
             @Override
@@ -100,12 +110,16 @@ if(currentThread().)
         };
         sui.chatTf.addActionListener(enter);
         sui.banBtn.addActionListener(this);
+        sui.startBtn.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(sui.banBtn)) {
             kick();
+        }if (e.getSource().equals(sui.startBtn)) {
+            System.out.println("스타트 클릭");
+            gameThread.start();
         }
     }
 

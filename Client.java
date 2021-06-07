@@ -1,6 +1,7 @@
 
 import javax.print.DocFlavor;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.DatagramPacket;
@@ -12,7 +13,7 @@ import java.io.*;
 import java.lang.*;
 
 
-class Client implements Runnable,ActionListener {
+class Client implements Runnable, ActionListener {
     String name = "";
     String type;
     String topic[];
@@ -34,17 +35,18 @@ class Client implements Runnable,ActionListener {
     LoginUi ui;
     int nop;
     ArrayList<String> topicNames = new ArrayList<String>();
-    String msg;
+    String lsnMsg, spkMsg;
     ClientUi cui;
     Thread listenTh = new Thread(this);
+
     Client(ClientUi cui) {
         this.cui = cui;
-        this.ui =cui.ui;
+        this.ui = cui.ui;
         this.ip = cui.ip;
         this.port = Integer.parseInt(cui.port);
         this.id = cui.id;
         try {
-            System.out.println(id+ip+port);
+            System.out.println(id + ip + port);
             s = new Socket(ip, port);
             is = s.getInputStream();
             os = s.getOutputStream();
@@ -65,6 +67,7 @@ class Client implements Runnable,ActionListener {
                 dos.writeUTF(id);
                 dos.flush();
             }
+            new GameManager(this);
         } catch (IOException ie) {
             System.out.println("Client ie: " + ie);
             JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
@@ -74,39 +77,62 @@ class Client implements Runnable,ActionListener {
     }
 
     String listen() {
-        String msg = "";
+        lsnMsg = "";
         try {
-            msg = dis.readUTF();
-            System.out.println(msg);
-            if (msg.startsWith(id + ">>") & !msg.startsWith(id + " ")) {
-                msg = msg.replaceFirst(id, "나 ");
-                return msg;
-            } else if (msg.startsWith("topic:")) {
-                msg = "topic:" + msg.substring(6);
-                return msg;
-            } else if (msg.startsWith(id + "님이 강퇴")) {
-                s.close();
-                JOptionPane.showMessageDialog(null, "관리자에 의해 강퇴당하셨습니다.", "강퇴", 0);
-                cui.dispose();
-                ui.reopen();
-                return "exit";
-            } else {
-                System.out.println(msg);
-                return msg;
-            }
+            lsnMsg = dis.readUTF();
+            System.out.println(lsnMsg);
+            return protocol();
         } catch (IOException ie) {
             return "exit";
         }
 
     }
 
+    String protocol() throws IOException {
+        if (lsnMsg.startsWith(id + ">>") & !lsnMsg.startsWith(id + " ")) {
+            lsnMsg = lsnMsg.replaceFirst(id, "나 ");
+            return lsnMsg;
+        } else if (lsnMsg.startsWith("liar:")) {
+            if (lsnMsg.substring(5).equals(id)) {
+                cui.topicTf.setText("당신은 라이어입니다");
+            } else {
+                cui.topicTf.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+            }
+            return null;
+        } else if (lsnMsg.startsWith("topic:")) {
+            if (cui.topicTf.getText().equals("당신은 라이어입니다")) {
+                return null;
+            }
+            cui.topicTf.setText(lsnMsg.substring(6));
+            return null;
+        } else if (lsnMsg.startsWith(id + "님이 강퇴")) {
+            s.close();
+            JOptionPane.showMessageDialog(null, "관리자에 의해 강퇴당하셨습니다.", "강퇴", 0);
+            cui.dispose();
+            ui.reopen();
+            return "exit";
+        } else if (lsnMsg.startsWith("채팅락")) {
+            cui.chatTf.setEnabled(false);
+            return null;
+        } else if (lsnMsg.startsWith("채팅언락")) {
+            if (lsnMsg.substring(4).equals(id)) {
+                String msg = JOptionPane.showInputDialog("10초안에 한마디로 주제를 설명해주세요.");
+                speak(msg);
+            }
+            return null;
+        } else {
+            System.out.println(lsnMsg);
+            return lsnMsg;
+        }
+    }
+
     void act() {
         Action enter = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                msg = cui.chatTf.getText();
-                msg = msg.trim();
-                speak(msg);
+                spkMsg = cui.chatTf.getText();
+                spkMsg = spkMsg.trim();
+                speak(spkMsg);
                 cui.chatTf.setText(null);
             }
         };
@@ -117,7 +143,7 @@ class Client implements Runnable,ActionListener {
 
 
     @Override
-    public void actionPerformed (ActionEvent e){
+    public void actionPerformed(ActionEvent e) {
 
         if (e.getSource().equals(cui.endBtn)) {
             try {
@@ -131,9 +157,7 @@ class Client implements Runnable,ActionListener {
     }
 
 
-
-
-    void speak(String str) {                                                //todo Client Ui에서 chatTf리스너로 작동 구현할것
+    void speak(String str) {
         try {
             dos.writeUTF(id + ">> " + str);
             dos.flush();
@@ -149,9 +173,7 @@ class Client implements Runnable,ActionListener {
                 String msg = null;
                 msg = listen();
                 if (msg != null) {
-                    if (msg.startsWith("topic:")) {
-                        cui.topicTf.setText(msg.substring(6));
-                    } else if (msg.equals("exit")) {
+                    if (msg.equals("exit")) {
                         break;
                     } else {
                         cui.ta.append(msg + "\n");
@@ -160,6 +182,7 @@ class Client implements Runnable,ActionListener {
             }
         }
     }
+
 
     void readerFileName() {
         try {
