@@ -31,8 +31,7 @@ class ServerUi extends JFrame implements ActionListener {
 
     void init() {
         cp = getContentPane();
-        cp.setLayout(new BorderLayout());                                                           //cp
-
+        cp.setLayout(new BorderLayout());
         endP = new JPanel(new BorderLayout());
         endBtn = new JButton("Á¾·á");
         endP.add(endBtn, BorderLayout.WEST);
@@ -57,11 +56,12 @@ class ServerUi extends JFrame implements ActionListener {
         btnP.add(idBox);
         btnP.add(clearBtn);
         chatTf = new JTextField("");
-
+        ta.setEnabled(false);
         chatP.add(chatTf, BorderLayout.CENTER);
         chatP.add(btnP, BorderLayout.SOUTH);
         cp.add(chatP, BorderLayout.SOUTH);                                                            //chatP
-
+        ta.setFont(new Font("¸¼Àº °íµñ",Font.BOLD,20));
+        ta.setDisabledTextColor(Color.black);
         setUi();
         act();
     }

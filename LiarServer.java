@@ -16,7 +16,7 @@ class LiarServer extends Thread implements ActionListener {
       Thread serverThread;
       ServerUi sui;
       String msg;
-      String liarTopic = "10ì´ˆì´ˆê³¼";
+      String liarTopic = "10ÃÊÃÊ°ú";
       ArrayList voteList;
 
       LiarServer(ServerUi sui) {
@@ -26,7 +26,7 @@ class LiarServer extends Thread implements ActionListener {
                   port = Integer.parseInt(portN);
                   ss = new ServerSocket(port);
                   System.out.println(ss);
-                  sui.setTitle("ip: " + InetAddress.getLocalHost().getHostAddress() + ", port: " + port + " ì„œë²„ê´€ë¦¬ì");
+                  sui.setTitle("ip: " + InetAddress.getLocalHost().getHostAddress() + ", port: " + port + " ¼­¹ö°ü¸®ÀÚ");
             } catch (IOException e) {
                   e.printStackTrace();
             }
@@ -42,7 +42,7 @@ class LiarServer extends Thread implements ActionListener {
             String banId = String.valueOf(sui.idBox.getSelectedItem());
             for (OneClientModul ocm : v) {
                   if (ocm.chatId.equals(banId)) {
-                        ocm.broadcast(ocm.chatId + "ë‹˜ì´ ê°•í‡´ë‹¹í–ˆìŠµë‹ˆë‹¤..");
+                        ocm.broadcast(ocm.chatId + "´ÔÀÌ °­Åğ´çÇß½À´Ï´Ù..");
                         v.remove(ocm);
                         ocm.closeAll();
                         break;
@@ -63,7 +63,7 @@ class LiarServer extends Thread implements ActionListener {
                                     System.out.println("false");
                               } else if (gameThread.isAlive() == true) {
                                     dos.writeUTF("true");
-                                    dos.writeUTF("3ì´ˆí›„");
+                                    dos.writeUTF("3ÃÊÈÄ");
                                     System.out.println("enterfalse");
                               } else if (v.size() < 8) {
                                     dos.writeUTF("true");
@@ -74,11 +74,11 @@ class LiarServer extends Thread implements ActionListener {
                               }
                         }
                   } catch (IOException ie) {
-                        pln(port + "ë²ˆ í¬íŠ¸ ì‚¬ìš©ì¤‘.");
+                        pln(port + "¹ø Æ÷Æ® »ç¿ëÁß.");
                   } finally {
                         try {
                               if (ss != null) ss.close();
-                              System.out.println("ì„œë²„ë‹¤ìš´");
+                              System.out.println("¼­¹ö´Ù¿î");
                         } catch (IOException ie) {
                         }
                   }
@@ -86,14 +86,14 @@ class LiarServer extends Thread implements ActionListener {
             if (currentThread().equals(gameThread)) {
                   try {
                         if (v.size() != 0) {
-                              ocm.broadcast("3ì´ˆí›„ ê²Œì„ì„ ì‹œì‘í•©ë‹ˆë‹¤.");
+                              ocm.broadcast("3ÃÊÈÄ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
                               sleep(1000);
-                              ocm.broadcast("2ì´ˆí›„ ê²Œì„ì„ ì‹œì‘í•©ë‹ˆë‹¤.");
+                              ocm.broadcast("2ÃÊÈÄ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
                               sleep(1000);
-                              ocm.broadcast("1ì´ˆí›„ ê²Œì„ì„ ì‹œì‘í•©ë‹ˆë‹¤.");
+                              ocm.broadcast("1ÃÊÈÄ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
                               sleep(1000);
                               voteList = new ArrayList();
-                              System.out.println("ê²œë©”");
+                              System.out.println("°×¸Ş");
                               new GameManager(this);
                         }
                   } catch (InterruptedException e) {
@@ -116,12 +116,12 @@ class LiarServer extends Thread implements ActionListener {
                   public void actionPerformed(ActionEvent e) {
                         msg = sui.chatTf.getText();
                         msg = msg.trim();
-                        msg = "ê´€ë¦¬ì >> " + msg;
+                        msg = "°ü¸®ÀÚ >> " + msg;
                         sui.chatTf.setText(null);
                         if (v.size() != 0) {
                               ocm.broadcast(msg);
                         } else {
-                              sui.ta.append("ì„œë²„ì— ì¸ì›ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+                              sui.ta.append("¼­¹ö¿¡ ÀÎ¿øÀÌ ¾ø½À´Ï´Ù.\n");
                         }
                   }
             };
@@ -154,10 +154,10 @@ class LiarServer extends Thread implements ActionListener {
       void p(String str) {
             System.out.print(str);
       }
-}                                                                                               //ë¼ì´ì–´ì„œë²„
+}                                                                                               //¶óÀÌ¾î¼­¹ö
 
 
-class OneClientModul extends Thread {                                                           //ì›í´ëª¨ë“ˆ
+class OneClientModul extends Thread {                                                           //¿øÅ¬¸ğµâ
       LiarServer ls;
       Socket s;
       InputStream is;
@@ -209,7 +209,7 @@ class OneClientModul extends Thread {                                           
             String msg = "";
             int i;
             try {
-                  broadcast(chatId + " ë‹˜ì´ ì…ì¥í•˜ì…¨ìŠµë‹ˆë‹¤. (í˜„ì¬ ì¸ì›: " + ls.v.size() + "ëª…)");
+                  broadcast(chatId + " ´ÔÀÌ ÀÔÀåÇÏ¼Ì½À´Ï´Ù. (ÇöÀç ÀÎ¿ø: " + ls.v.size() + "¸í)");
                   while (true) {
                         msg = dis.readUTF();
                         if (msg.startsWith("liarTopic")) {
@@ -220,7 +220,7 @@ class OneClientModul extends Thread {                                           
                         } else if (msg.startsWith("cVote")) {
                               msg = msg.substring(5);
                               ls.voteList.add(msg);
-                              System.out.println("íˆ¬í‘œ : " + msg);
+                              System.out.println("ÅõÇ¥ : " + msg);
                               if (ls.voteList.size() == ls.v.size()) {
                                     ls.gameThread.interrupt();
                               }
@@ -230,7 +230,7 @@ class OneClientModul extends Thread {                                           
                   }
             } catch (IOException ie) {
                   ls.v.remove(this);
-                  broadcast(chatId + " ë‹˜ì´ í‡´ì¥í•˜ì…¨ìŠµë‹ˆë‹¤. (í˜„ì¬ ì¸ì›: " + ls.v.size() + "ëª…)");
+                  broadcast(chatId + " ´ÔÀÌ ÅğÀåÇÏ¼Ì½À´Ï´Ù. (ÇöÀç ÀÎ¿ø: " + ls.v.size() + "¸í)");
             } finally {
                   closeAll();
             }

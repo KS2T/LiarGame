@@ -25,9 +25,9 @@ class Result extends JDialog implements ActionListener,Runnable {
     public void run() {
         try {
             if (result.equals("liarLose")) {
-                Thread.sleep(4500);
-            }else if (result.equals("liarWin")) {
                 Thread.sleep(3100);
+            }else if (result.equals("liarWin")) {
+                Thread.sleep(4500);
             }
             okBtn.setVisible(true);
             okBtn.addActionListener(this);
@@ -36,7 +36,7 @@ class Result extends JDialog implements ActionListener,Runnable {
         }
     }
 
-    void liarLose(){
+    void liarWin(){
         Nliar = new ImagePanel("라이어아님.gif");
         Nliar.setLayout(null);
         setContentPane(Nliar);
@@ -54,7 +54,7 @@ class Result extends JDialog implements ActionListener,Runnable {
 
 
     }
-    void liarWin(){
+    void liarLose(){
         Tliar = new ImagePanel("라이어잡음.gif");
         Tliar.setLayout(null);
         setContentPane(Tliar);

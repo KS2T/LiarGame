@@ -4,15 +4,14 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 
-class VoteDialog extends JDialog {
+class VoteDialog extends JDialog implements ActionListener,ListSelectionListener{
 
     JList<String> voteList;
     JFrame frame;
     ClientUi clientUi;
     Client c;
-    Container container;
-    JPanel vPanel;
-    JButton vButton = new JButton("투표하기");
+    JPanel vPanel,p1;
+    RoundedButton vButton = new RoundedButton("투표하기");
     String result;
 
 
@@ -22,8 +21,6 @@ class VoteDialog extends JDialog {
         this.c=c;
         this.frame = c.frame;
 
-        getResult();
-        System.out.println(getResult());
     }
 
     String getResult() {
@@ -31,53 +28,51 @@ class VoteDialog extends JDialog {
         voteList = new JList<>(c.idList);
         voteList.setVisibleRowCount(4);
         voteList.setSelectedIndex(0);
-        container = getContentPane();
-        container.getMaximumSize();
         vPanel = new JPanel();
-        container.setLayout(new BorderLayout());
-        container.add(vPanel, BorderLayout.CENTER);
-        vPanel.setLayout(new GridLayout(2, 1));
-        vPanel.add(vButton);
-        vPanel.add(voteList);
+        setContentPane(vPanel);
+        vPanel.setLayout(new BorderLayout());
+        vPanel.add(voteList,BorderLayout.CENTER);
+        voteList.setBounds(0,0,100,100);
+        p1 = new JPanel();
+        p1.add(vButton);
+        p1.setBackground(Color.black);
+        vPanel.add(p1,BorderLayout.SOUTH);
+        vButton.setPreferredSize(new Dimension(60,30));
         voteList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         voteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        voteList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                int index = voteList.getSelectedIndex();
-                result = c.idList.get(index);
-                dispose();
-            }
-        });
-        setSize(800, 300);
-        setLocation(200, 100);
-        setVisible(true);
-
+        voteList.addListSelectionListener(this);
         vButton.setActionCommand("투표하기");
-        vButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource().equals(vButton)) {
-                    int index = voteList.getSelectedIndex();
-                    result = c.idList.get(index);
-                    dispose();
-                }
-            }
-        });
+        vButton.addActionListener(this);
 
         voteList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if (e.getClickCount() == 2) {
+                if (e.getClickCount() >= 2) {
                     vButton.doClick();
 
                 }
             }
         });
 
+        setUi();
         return result;
     }
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(vButton)) {
+            int index = voteList.getSelectedIndex();
+            result = c.idList.get(index);
+        }
 
-
+        dispose();
+    }
+    public void valueChanged(ListSelectionEvent e) {
+        int index = voteList.getSelectedIndex();
+        result = c.idList.get(index);
+    }
+void setUi(){
+    setSize(300, 200);
+    setLocationRelativeTo(null);
+    setVisible(true);
+}
 }

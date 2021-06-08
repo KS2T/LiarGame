@@ -22,7 +22,6 @@ class ClientUi extends JFrame {
     };
     JTextField topicTf, timeTf, chatTf;
     String idList[] = {"asd", "assd", "asdasasdasdasdasdd"};
-    JComboBox idCb;
     JScrollPane sp;
     JPanel tfP, p1, p2, taP, northP, endP, chatP;
     RoundedButton endBtn = new RoundedButton("서버 나가기");
@@ -80,18 +79,18 @@ class ClientUi extends JFrame {
         tfP = new ImagePanel("pBack.png");
         topicTf = new JTextField(10);
         topicTf.setEnabled(false);
-        topicTf.setFont(f);
+        topicTf.setDisabledTextColor(Color.black);
+
         JPanel topicP = new JPanel(new BorderLayout());
         topicP.add(topicTf, BorderLayout.EAST);
         timeTf = new JTextField(10);
         timeTf.setEnabled(false);
         timeTf.setFont(f);
-        idCb = new JComboBox(idList);
+        timeTf.setDisabledTextColor(Color.black);
         JPanel selectP = new JPanel(new BorderLayout());
         selectP.add(timeTf, BorderLayout.WEST);
         tfP.add(topicP);
         tfP.add(selectP);
-        tfP.add(idCb);                                      //콤보박스 추가
         northP.add(tfP, BorderLayout.SOUTH);
         cp.add(northP, BorderLayout.NORTH);                                      //northP
 
@@ -116,6 +115,8 @@ class ClientUi extends JFrame {
         taP = new JPanel(new BorderLayout());
         taP.add(ta, BorderLayout.CENTER);
         sp = new JScrollPane(ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //cp
+        sp.getVerticalScrollBar().setValue(sp.getVerticalScrollBar().getMaximum());
         taP.add(sp);                                                                            //ta패널
 
 
