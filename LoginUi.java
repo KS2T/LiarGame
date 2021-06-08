@@ -21,7 +21,17 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
     {
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, file);
-        } catch (FontFormatException e) {
+            File file = new File("bgm.wav");
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(file);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioIn);
+                clip.start();
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+        }catch (UnsupportedAudioFileException e) {
+                e.printStackTrace();
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+        }catch (FontFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,9 +57,9 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
     }
 
     void init() { //
-        serverBtn = new RoundedButton("¼­¹ö »ı¼ºÇÏ±â");
-        clientBTn = new RoundedButton("¼­¹ö ÀÔÀåÇÏ±â");
-        endBtn = new RoundedButton("Á¾·áÇÏ±â");
+        serverBtn = new RoundedButton("ì„œë²„ ìƒì„±í•˜ê¸°");
+        clientBTn = new RoundedButton("ì„œë²„ ì…ì¥í•˜ê¸°");
+        endBtn = new RoundedButton("ì¢…ë£Œí•˜ê¸°");
         p1 = new ImagePanel("back2.gif");
         setContentPane(p1);
         p1.add(serverBtn);
@@ -67,7 +77,7 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
     }
 
     void setUi() {
-        setTitle("¶óÀÌ¾î°ÔÀÓ");
+        setTitle("ë¼ì´ì–´ê²Œì„");
         setVisible(true);
         setSize(805, 630);
         setResizable(false);
@@ -76,15 +86,15 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void actionPerformed(ActionEvent e) {                                      //¹öÆ° ¸®½º³Ê »ı¼º
+    public void actionPerformed(ActionEvent e) {                                      //ë²„íŠ¼ ë¦¬ìŠ¤ë„ˆ ìƒì„±
         if (e.getSource().equals(serverBtn)) {
-            LoginDialog lD = new LoginDialog(this, this, "¼­¹ö »ı¼ºÇÏ±â");
+            LoginDialog lD = new LoginDialog(this, this, "ì„œë²„ ìƒì„±í•˜ê¸°");
             ip = lD.ipTf.getText();
             port = lD.portTf.getText();
 
         }
         if (e.getSource().equals(clientBTn)) {
-            LoginDialog lD = new LoginDialog(this, this, "¼­¹ö ÀÔÀåÇÏ±â");
+            LoginDialog lD = new LoginDialog(this, this, "ì„œë²„ ì…ì¥í•˜ê¸°");
             ip = lD.ipTf.getText();
             port = lD.portTf.getText();
         }
@@ -93,7 +103,7 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
         }
     }
 
-    void action() {                                                                       //¹öÆ°¸®½º³Ê ÀÔ·Â
+    void action() {                                                                       //ë²„íŠ¼ë¦¬ìŠ¤ë„ˆ ì…ë ¥
         serverBtn.addActionListener(this);
         clientBTn.addActionListener(this);
         endBtn.addActionListener(this);
@@ -113,7 +123,7 @@ class ImagePanel extends JPanel {
 
     Image image;
 
-    public ImagePanel(String str) {                                                  //       ÆĞ³Î¿¡ ÀÌ¹ÌÁö ÀÔ¶ÇÏ±â
+    public ImagePanel(String str) {                                                  //       íŒ¨ë„ì— ì´ë¯¸ì§€ ì…ë˜æ­
 
         image = Toolkit.getDefaultToolkit().createImage(str);
     }
@@ -128,7 +138,7 @@ class ImagePanel extends JPanel {
 
 }
 
-class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã »ı¼ºµÇ´Â Ã¢          todo
+class LoginDialog extends JDialog implements ActionListener { //    ë²„íŠ¼ í´ë¦­ì‹œ ìƒì„±ë˜ëŠ” ì°½          todo
     JTextField idTf, ipTf, portTf;
     JLabel idLb, ipLb, portLb;
     JButton okBtn, noBtn, ipBtn;
@@ -143,10 +153,10 @@ class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã 
         this.ui = ui;
         this.title = title;
         init();
-        if (getTitle().equals("¼­¹ö »ı¼ºÇÏ±â")) {
+        if (getTitle().equals("ì„œë²„ ìƒì„±í•˜ê¸°")) {
             addS();
             setUiS();
-        } else if (getTitle().equals("¼­¹ö ÀÔÀåÇÏ±â")) {
+        } else if (getTitle().equals("ì„œë²„ ì…ì¥í•˜ê¸°")) {
             addC();
             setUiC();
         }
@@ -154,14 +164,14 @@ class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã 
 
     void init() {
 
-        idLb = new JLabel("¾ÆÀÌµğ");
+        idLb = new JLabel("ì•„ì´ë””");
         idTf = new JTextField(10);
-        ipLb = new JLabel("¾ÆÀÌÇÇ");
+        ipLb = new JLabel("ì•„ì´í”¼");
         ipTf = new JTextField(10);
-        portLb = new JLabel("Æ÷Æ®");
+        portLb = new JLabel("í¬íŠ¸");
         portTf = new JTextField(10);
-        okBtn = new JButton("È®ÀÎ");
-        noBtn = new JButton("Ãë¼Ò");
+        okBtn = new JButton("í™•ì¸");
+        noBtn = new JButton("ì·¨ì†Œ");
         okBtn.addActionListener(this);
         noBtn.addActionListener(this);
         p1 = new JPanel();
@@ -202,9 +212,9 @@ class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã 
     }
 
 
-    public void actionPerformed(ActionEvent e) {                                            //todo ip,port,id nullÀâ¾ÆÁÖ±â
+    public void actionPerformed(ActionEvent e) {                                            //todo ip,port,id nullì¡ì•„ì£¼ê¸°
 
-        if (e.getSource().equals(okBtn) & title.equals("¼­¹ö »ı¼ºÇÏ±â")) {
+        if (e.getSource().equals(okBtn) & title.equals("ì„œë²„ ìƒì„±í•˜ê¸°")) {
             ui.port = portTf.getText().trim();
             Boolean chk = check();
             if (chk = true) {
@@ -212,7 +222,7 @@ class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã 
                 frame.dispose();
                 new ServerUi(ui);
             }
-        } else if (e.getSource().equals(okBtn) & title.equals("¼­¹ö ÀÔÀåÇÏ±â")) {
+        } else if (e.getSource().equals(okBtn) & title.equals("ì„œë²„ ì…ì¥í•˜ê¸°")) {
             ui.id = idTf.getText().trim();
             ui.ip = ipTf.getText().trim();
             ui.port = portTf.getText().trim();
@@ -238,19 +248,19 @@ class LoginDialog extends JDialog implements ActionListener { //    ¹öÆ° Å¬¸¯½Ã 
 
             int i = Integer.parseInt(ui.port);
             if (1 > i | i > 65535) {
-                JOptionPane.showMessageDialog(null, "Á¤È®ÇÑ Æ÷Æ®¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.");
+                JOptionPane.showMessageDialog(null, "ì •í™•í•œ í¬íŠ¸ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.");
                 return false;
             }
             return true;
         } catch (NumberFormatException ne) {
-            JOptionPane.showMessageDialog(null, "Á¤È®ÇÑ Æ÷Æ®¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä");
+            JOptionPane.showMessageDialog(null, "ì •í™•í•œ í¬íŠ¸ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”");
             return false;
         }
     }
 
-} //·Î±×ÀÎ ´ÙÀÌ¾ó·Î±×
+} //ë¡œê·¸ì¸ ë‹¤ì´ì–¼ë¡œê·¸
 
-class RoundedButton extends JButton {                                                       //¶ó¿îµğµå ¹öÆ° Å¬·¡½º
+class RoundedButton extends JButton {                                                       //ë¼ìš´ë””ë“œ ë²„íŠ¼ í´ë˜ìŠ¤
 
     private static final long serialVersionUID = 1L;
     private Color startColor = new Color(217, 173, 29);
@@ -283,7 +293,7 @@ class RoundedButton extends JButton {                                           
 
         setContentAreaFilled(false);
         setBorderPainted(false);
-        setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
+        setFont(new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 16));
         setForeground(Color.WHITE);
         setFocusable(false);
     }
