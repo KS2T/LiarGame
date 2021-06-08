@@ -3,16 +3,15 @@ import java.net.URL;
 import javax.sound.sampled.*;
 import javax.swing.*;
    
-public class bgm extends JFrame implements Runnable {
-  public bgm() {
+public class bgm extends JFrame {
+   
+  
+   public bgm() {
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       this.setTitle("Test Sound Clip");
       this.setSize(300, 200);
       this.setVisible(true);
-
-  }
-   public void run(){
-   
+	
       try {
          // Open an audio input stream.
 
@@ -31,12 +30,9 @@ public class bgm extends JFrame implements Runnable {
       } catch (LineUnavailableException e) {
          e.printStackTrace();
       }
-   
    }
-
-  
- public static void main(String[] args) {
-      bgm m = new bgm();
-	  m.run();
+   
+   public static void main(String[] args) {
+      new bgm();
    }
 }
