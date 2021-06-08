@@ -186,7 +186,10 @@ class Client implements Runnable, ActionListener {
             String vote = new VoteDialog(this).getResult();
             System.out.println(vote);
             speak("cVote"+vote);
-        }
+        }else if(lsnMsg.startsWith("result")){
+            lsnMsg=lsnMsg.substring(6);
+            new Result(this,lsnMsg);
+         }
 
     }
 

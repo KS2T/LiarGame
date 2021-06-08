@@ -1,8 +1,6 @@
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.Timer;
 
 public class GameManager {
 
@@ -15,6 +13,7 @@ public class GameManager {
     Vector<Client> cv = new Vector<>();
 
     GameManager(LiarServer ls) {
+        System.out.println("°×¸Þ µé¾î¿È");
         this.ls = ls;
         for (OneClientModul ocm : ls.v) {
             playerList.add(ocm.chatId);
@@ -30,6 +29,7 @@ public class GameManager {
         oneChat();
         vote();
         liarSelect();
+        result();
         unlockAll();
     }
 
@@ -67,6 +67,7 @@ public class GameManager {
         }
 
         Random topicGenerator = new Random();
+        System.out.println(topicList.size());
         int topicListIndex = topicGenerator.nextInt(topicList.size());
         topic = topicList.get(topicListIndex);
 
@@ -131,5 +132,8 @@ public class GameManager {
 
     void gm(String str) {
         ls.ocm.broadcast("gm" + str);
+    }
+    void result(){
+        gm("resultliarWin");
     }
 }

@@ -1,58 +1,83 @@
-
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-class Result extends JDialog {
-    JTextArea ta;
-    Container cp;
-    Font f = new Font("궁서체",Font.BOLD,40);
-    JButton okBtn;
-    Result() {
-        cp = getContentPane();
-        cp.setLayout(new BorderLayout());
-        String liarWin = "라이어가 제시어 추리에 성공했습니다.";
-        String liarLose = "라이어가 제시어 추리에 실패했습니다.";
-
-        okBtn = new JButton("확인");
-        okBtn.setVisible(false);
-        String str = liarWin;                                   //win lose 선택
-         ta = new JTextArea();
-        ta.setFont(f);
-        ta.setEnabled(false);
-        ta.setLineWrap(true);
-
-        cp.add(ta,BorderLayout.CENTER);
-        cp.add(okBtn,BorderLayout.SOUTH);
-        setUi();
-        for (int i = 0; i < str.length(); i++) {
-            ta.setText(str.substring(0, i + 1));
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
-            if (i == 12) {
-                try {
-                    Thread.sleep(1300);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-
-
-            }
+class Result extends JDialog implements ActionListener,Runnable {
+    RoundedButton okBtn;
+    JPanel Nliar, Tliar;
+    JTextArea jta = new JTextArea();
+    JScrollPane scr = new JScrollPane(jta);
+    Thread timeTh;
+    String result="";
+    Result(Client c ,String str) {
+        result = str;
+        if(result.equals("liarWin")){
+            liarWin();
+        }else if(result.equals("liarLose")){
+            liarLose();
         }
 
-        okBtn.setVisible(true);
+
     }
 
+    @Override
+    public void run() {
+        try {
+            if (result.equals("liarLose")) {
+                Thread.sleep(4500);
+            }else if (result.equals("liarWin")) {
+                Thread.sleep(3100);
+            }
+            okBtn.setVisible(true);
+            okBtn.addActionListener(this);
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void liarLose(){
+        Nliar = new ImagePanel("라이어아님.gif");
+        Nliar.setLayout(null);
+        setContentPane(Nliar);
+        okBtn = new RoundedButton("확인");
+        okBtn.setVisible(false);
+        Nliar.add(okBtn);
+        okBtn.setBounds(150, 110, 70, 30);
+        timeTh=new Thread(this);
+        timeTh.start();
+        setUi();
+
+
+
+
+
+
+    }
+    void liarWin(){
+        Tliar = new ImagePanel("라이어잡음.gif");
+        Tliar.setLayout(null);
+        setContentPane(Tliar);
+        okBtn = new RoundedButton("확인");
+        okBtn.setVisible(false);
+        Tliar.add(okBtn);
+        okBtn.setBounds(150, 110, 70, 30);
+        timeTh=new Thread(this);
+        timeTh.start();
+        setUi();
+    }
     void setUi() {
         setTitle("결과!");
         setVisible(true);
-        setSize(400, 400);
+        setSize(380, 195);
         setResizable(false);
+        setLayout(new BorderLayout());
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    }
+
+    public void actionPerformed(ActionEvent e){
+        dispose();
     }
 
 }

@@ -18,7 +18,6 @@ class LiarServer extends Thread implements ActionListener {
     String msg;
     String liarTopic = "10초초과";
     ArrayList voteList;
-    int voteNum[];
     LiarServer(ServerUi sui) {
         try {
             this.sui = sui;
@@ -90,6 +89,7 @@ class LiarServer extends Thread implements ActionListener {
                     ocm.broadcast("1초후 게임을 시작합니다.");
                     sleep(1000);
                     voteList = new ArrayList();
+                    System.out.println("겜메");
                     new GameManager(this);
                 }
             } catch (InterruptedException e) {
