@@ -29,7 +29,6 @@ public class GameManager {
             oneChat();
             vote();
             liarSelect();
-            result();
             unlockAll();
       }
 
@@ -46,7 +45,7 @@ public class GameManager {
             lockChat();
             ls.sleepTh(10);
             for (OneClientModul ocm : ls.v) {
-                  gm("채팅언락" +ocm.chatId);
+                  gm("채팅언락" + ocm.chatId);
                   ls.sleepTh(10);
 
             }
@@ -114,29 +113,34 @@ public class GameManager {
                   if (liarTopic.equals(topic)) {
                         System.out.println("라이어승리");
                         ls.ocm.broadcast("라이어승리");
+                        result("resultliarWin");
                   } else if (liarTopic.equals("10초초과")) {
                         ls.ocm.broadcast("라이어가 제한시간에 제시어를 입력하지 못했습니다.");
                         ls.ocm.broadcast("라이어패배");
+                        result("resultliarLose");
 
                   } else {
                         ls.ocm.broadcast("라이어가 제시어를 맞히지 못햇습니다." +
                                 "\n라이어 패배");
                         ls.ocm.broadcast(" 제시어 : " + topic + "+, 라이어가 입력한 제시어 : " + liarTopic);
+                        result("resultliarLose");
                   }
                   ls.liarTopic = "10초초과";
             } else {
                   System.out.println("라이어승리");
                   ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: " + liar);
                   ls.ocm.broadcast("라이어승리");
+                  result("resultliarWin");
             }
             //result();
+      }
+
+      void result(String str) {
+            gm(str);
       }
 
       void gm(String str) {
             ls.ocm.broadcast("gm" + str);
       }
 
-      void result() {
-            gm("resultliarWin");
-      }
 }
