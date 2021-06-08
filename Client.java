@@ -70,53 +70,58 @@ class Client implements Runnable, ActionListener {
             this.id = cui.id;
             this.frame = cui;
             try {
-                  System.out.println(id + ip + port);
-                  s = new Socket(ip, port);
+                  System.out.println(id +""+ ip +""+ port);
+                  s = new Socket("127.0.0.1",3000);
+                  System.out.println(s);
                   is = s.getInputStream();
                   os = s.getOutputStream();
                   dis = new DataInputStream(is);
                   dos = new DataOutputStream(os);
-                  System.out.println("ì—°ê²°");
+                  System.out.println("¿¬°á");
                   String ent = dis.readUTF();
                   System.out.println(ent);
                   act();
+                  listenTh = new Thread(this);
                   if (ent.equals("falsefull")) {
                         System.out.println("enterfalse");
-                        JOptionPane.showMessageDialog(null, "í•´ë‹¹ ì„œë²„ì˜ ì¸ì›ì´ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤", "ì¸ì› ì´ˆê³¼", 0);
+                        JOptionPane.showMessageDialog(null, "ÇØ´ç ¼­¹öÀÇ ÀÎ¿øÀÌ °¡µæ Ã¡½À´Ï´Ù", "ÀÎ¿ø ÃÊ°ú", 0);
                         dos.writeUTF("enterfalse");
                         dos.flush();
                         cui.ui.reopen();
                         cui.ui.clientBTn.doClick();
                   } else {
-                        dos.writeUTF(id);
                         ent = dis.readUTF();
                         System.out.println(ent);
                         if (ent.equals("falseid")) {
                               System.out.println("enterfalse");
-                              JOptionPane.showMessageDialog(null, "ì¤‘ë³µëœ ì•„ì´ë””ê°€ ìˆìŠµë‹ˆë‹¤.", "IDì¤‘ë³µ", 0);
+                              JOptionPane.showMessageDialog(null, "Áßº¹µÈ ¾ÆÀÌµğ°¡ ÀÖ½À´Ï´Ù.", "IDÁßº¹", 0);
                               dos.writeUTF("enterfalse");
                               dos.flush();
                               cui.ui.reopen();
                               cui.ui.clientBTn.doClick();
-                        } else if (ent.equals("3ì´ˆí›„")) {
+                        } else if (ent.equals("3ÃÊÈÄ")) {
                               System.out.println("enterfalse");
-                              JOptionPane.showMessageDialog(null, "í•´ë‹¹ ì„œë²„ì˜ ê²Œì„ì´ ì‹œì‘ë˜ì—ˆìŠµë‹ˆë‹¤.", "ê²Œì„ ì‹œì‘", 0);
+                              JOptionPane.showMessageDialog(null, "ÇØ´ç ¼­¹öÀÇ °ÔÀÓÀÌ ½ÃÀÛµÇ¾ú½À´Ï´Ù.", "°ÔÀÓ ½ÃÀÛ", 0);
                               dos.writeUTF("enterfalse");
                               dos.flush();
                               cui.ui.reopen();
                               cui.ui.clientBTn.doClick();
 
                         } else {
-                              System.out.println("ë‚« í´ìŠ¤");
+                              System.out.println("³´ Æú½º");
+                              dos.writeUTF(id);
                               dos.flush();
-                              listenTh = new Thread(this);
                               listenTh.start();
                         }
 
+                        System.out.println("³´ Æú½º");
+                        nop = dis.read();
+                        dos.writeUTF(id);
+                        dos.flush();
                   }
             } catch (IOException ie) {
                   System.out.println("Client ie: " + ie);
-                  JOptionPane.showMessageDialog(null, "ì•„ì´í”¼ ë˜ëŠ” í¬íŠ¸ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.", "ì—°ê²° ì˜¤ë¥˜", 0);
+                  JOptionPane.showMessageDialog(null, "¾ÆÀÌÇÇ ¶Ç´Â Æ÷Æ®°¡ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.", "¿¬°á ¿À·ù", 0);
                   cui.dispose();
                   cui.ui.reopen();
                   cui.ui.clientBTn.doClick();
@@ -126,16 +131,16 @@ class Client implements Runnable, ActionListener {
 
       String protocol() throws IOException {
             if (lsnMsg.startsWith(id + ">>") & !lsnMsg.startsWith(id + " ")) {
-                  lsnMsg = lsnMsg.replaceFirst(id, "ë‚˜ ");
+                  lsnMsg = lsnMsg.replaceFirst(id, "³ª ");
                   return lsnMsg;
-            } else if (lsnMsg.startsWith(id + "ë‹˜ì´ ê°•í‡´")) {
+            } else if (lsnMsg.startsWith(id + "´ÔÀÌ °­Åğ")) {
                   s.close();
-                  JOptionPane.showMessageDialog(null, "ê´€ë¦¬ìì— ì˜í•´ ê°•í‡´ë‹¹í•˜ì…¨ìŠµë‹ˆë‹¤.", "ê°•í‡´", 0);
+                  JOptionPane.showMessageDialog(null, "°ü¸®ÀÚ¿¡ ÀÇÇØ °­Åğ´çÇÏ¼Ì½À´Ï´Ù.", "°­Åğ", 0);
                   cui.dispose();
                   ui.reopen();
                   return "exit";
             } else if (lsnMsg.startsWith("gm")) {
-                  System.out.println(lsnMsg + "gmë©”ì„¸ì§€");
+                  System.out.println(lsnMsg + "gm¸Ş¼¼Áö");
                   lsnMsg = lsnMsg.substring(2);
                   System.out.println(lsnMsg);
                   fromGm(lsnMsg);
@@ -157,21 +162,21 @@ class Client implements Runnable, ActionListener {
 
             if (lsnMsg.startsWith("liar:")) {
                   if (lsnMsg.substring(5).equals(id)) {
-                        cui.topicTf.setFont(new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 16));
-                        cui.topicTf.setText("ë‹¹ì‹ ì€ ë¼ì´ì–´ì…ë‹ˆë‹¤");
+                        cui.topicTf.setFont(new Font("¸¼Àº °íµñ", Font.BOLD, 16));
+                        cui.topicTf.setText("´ç½ÅÀº ¶óÀÌ¾îÀÔ´Ï´Ù");
                   } else {
                   }
             } else if (lsnMsg.startsWith("topic:")) {
-                  if (cui.topicTf.getText().equals("ë‹¹ì‹ ì€ ë¼ì´ì–´ì…ë‹ˆë‹¤")) {
+                  if (cui.topicTf.getText().equals("´ç½ÅÀº ¶óÀÌ¾îÀÔ´Ï´Ù")) {
                   } else {
                         cui.topicTf.setText(lsnMsg.substring(6));
                   }
-            } else if (lsnMsg.startsWith("ì±„íŒ…ë½")) {
+            } else if (lsnMsg.startsWith("Ã¤ÆÃ¶ô")) {
                   cui.chatTf.setEnabled(false);
-            } else if (lsnMsg.startsWith("ì±„íŒ…ì–¸ë½")) {
+            } else if (lsnMsg.startsWith("Ã¤ÆÃ¾ğ¶ô")) {
                   if (lsnMsg.substring(4).equals(id)) {
                         printTimer(cui.timeTf, 10);
-                        cui.ta.append("ìƒë‹¨ ì œí•œì‹œê°„ì•ˆì— ì œì‹œì–´ì— ëŒ€í•´ ì„¤ëª…í•´ì£¼ì„¸ìš”.\n");
+                        cui.ta.append("»ó´Ü Á¦ÇÑ½Ã°£¾È¿¡ Á¦½Ã¾î¿¡ ´ëÇØ ¼³¸íÇØÁÖ¼¼¿ä.\n");
                         cui.chatTf.setEnabled(true);
                         chatTimeTh = new Thread(this);
                         chatTimeTh.start();
@@ -181,14 +186,14 @@ class Client implements Runnable, ActionListener {
             } else if (lsnMsg.startsWith("votecom")) {
                   if (lsnMsg.substring(7).equals(id)) {
                         printTimer(cui.timeTf, 10);
-                        cui.ta.append("10ì´ˆì•ˆì— ì œì‹œì–´ë¥¼ ì¶”ë¦¬í•˜ì—¬ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                        cui.ta.append("10ÃÊ¾È¿¡ Á¦½Ã¾î¸¦ Ãß¸®ÇÏ¿© ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                         cui.chatTf.setEnabled(true);
                         chatTimeTh = new Thread(this);
                         chatTimeTh.start();
                         cui.chatTf.removeActionListener(enter);
                         cui.chatTf.addActionListener(enter3);
                   }
-            } else if (lsnMsg.startsWith("ì˜¬ì–¸ë½")) {
+            } else if (lsnMsg.startsWith("¿Ã¾ğ¶ô")) {
                   cui.chatTf.setEnabled(true);
                   cui.chatTf.setText("");
                   cui.topicTf.setText("");
@@ -200,7 +205,7 @@ class Client implements Runnable, ActionListener {
             } else if (lsnMsg.startsWith("list")) {
                   idList.add(lsnMsg.substring(4));
             } else if (lsnMsg.startsWith("vote")) {
-                  System.out.println("voteì…ì¥");
+                  System.out.println("voteÀÔÀå");
                   String vote = new VoteDialog(this).getResult();
                   System.out.println(vote);
                   speak("cVote" + vote);
@@ -302,7 +307,7 @@ class Client implements Runnable, ActionListener {
                               tf.setText("");
                               timer.cancel();
                         }
-                        tf.setText(leftSeconds + "ì´ˆ");
+                        tf.setText(leftSeconds + "ÃÊ");
 
                   }
 
