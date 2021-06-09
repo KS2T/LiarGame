@@ -11,7 +11,7 @@ public class GameManager {
       List<String> playerList = new ArrayList();
       LiarServer ls;
       Vector<Client> cv = new Vector<>();
-
+      HashSet<OneClientModul>ocmSet = new HashSet<>();
       GameManager(LiarServer ls) {
             System.out.println("겜메 들어옴");
             this.ls = ls;
@@ -29,7 +29,6 @@ public class GameManager {
             oneChat();
             vote();
             liarSelect();
-            result();
             unlockAll();
       }
 
@@ -44,9 +43,9 @@ public class GameManager {
       void oneChat() {
             ls.ocm.broadcast("채팅이 잠깁니다. 10초 후 순서대로 주제를 설명해주세요.");
             lockChat();
-            ls.sleepTh(10);
-            for (OneClientModul ocm : ls.v) {
-                  gm("채팅언락" +ocm.chatId);
+            ls.sleepTh(10);            ocmset();
+            for (OneClientModul ocm : ocmSet) {
+                  gm("채팅언락" + ocm.chatId);
                   ls.sleepTh(10);
 
             }
@@ -106,7 +105,7 @@ public class GameManager {
             System.out.println("Max: " + voteId);
             if (liar.equals(voteId)) {
                   gm("votecom" + voteId);
-                  ls.ocm.broadcast("라이어를 찾았습니다. 라이어가 제시어를 추리중입니다.");
+                  ls.ocm.broadcast("라이어를 찾았습니다. \nLiar: "+liar+" \n라이어가 제시어를 추리중입니다.");
                   ls.sleepTh(10);
                   String liarTopic;
                   liarTopic = ls.liarTopic;
@@ -114,29 +113,38 @@ public class GameManager {
                   if (liarTopic.equals(topic)) {
                         System.out.println("라이어승리");
                         ls.ocm.broadcast("라이어승리");
+                        result("resultliarWin");
                   } else if (liarTopic.equals("10초초과")) {
                         ls.ocm.broadcast("라이어가 제한시간에 제시어를 입력하지 못했습니다.");
                         ls.ocm.broadcast("라이어패배");
+                        result("resultliarLose");
 
                   } else {
                         ls.ocm.broadcast("라이어가 제시어를 맞히지 못햇습니다." +
                                 "\n라이어 패배");
-                        ls.ocm.broadcast(" 제시어 : " + topic + "+, 라이어가 입력한 제시어 : " + liarTopic);
+                        ls.ocm.broadcast(" 제시어 : " + topic + "\n라이어가 입력한 제시어 : " + liarTopic);
+                        result("resultliarLose");
                   }
                   ls.liarTopic = "10초초과";
             } else {
                   System.out.println("라이어승리");
-                  ls.ocm.broadcast("라이어를 찾아내지 못했습니다 Liar: " + liar);
+                  ls.ocm.broadcast("라이어를 찾아내지 못했습니다.\n Liar: " + liar);
                   ls.ocm.broadcast("라이어승리");
+                  result("resultliarWin");
             }
             //result();
       }
 
+      void result(String str) {
+            gm(str);
+      }
+      void ocmset(){
+            for (OneClientModul ocm : ls.v){
+                  ocmSet.add(ocm);
+            }
+      }
       void gm(String str) {
             ls.ocm.broadcast("gm" + str);
       }
 
-      void result() {
-            gm("resultliarWin");
-      }
 }

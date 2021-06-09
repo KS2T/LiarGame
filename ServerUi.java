@@ -75,24 +75,24 @@ class ServerUi extends JFrame implements ActionListener {
     }
 
 
-    /*public void sendMessage() {
+    /*public void sendmessage() {
         try {
-            String text = chatTf.getText();
+            string text = chattf.gettext();
             ta.append(text + "\n");
 
 
             //프로그램 종료
-            System.exit(0);
+            system.exit(0);
         else{
                 //입력된 메세지가 "/exit"가 아닐 경우( 전송할 메세지인 경우)
                 //클라이언트에게 메세지 전송
-                dos.writeUTF(text);
+                dos.writeutf(text);
 
                 //초기화 및 커서요청
-                chatTf.setText("");
-                chatTf.requestFocus();
+                chattf.settext("");
+                chattf.requestfocus();
             }
-        } catch (IOException e) {
+        } catch (ioexception e) {
         }
     }*/
     void act() {

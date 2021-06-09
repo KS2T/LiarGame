@@ -37,7 +37,7 @@ class VoteDialog extends JDialog implements ActionListener,ListSelectionListener
         p1.add(vButton);
         p1.setBackground(Color.black);
         vPanel.add(p1,BorderLayout.SOUTH);
-        vButton.setPreferredSize(new Dimension(60,30));
+        vButton.setPreferredSize(new Dimension(100,30));
         voteList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         voteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         voteList.addListSelectionListener(this);
@@ -71,7 +71,7 @@ class VoteDialog extends JDialog implements ActionListener,ListSelectionListener
         result = c.idList.get(index);
     }
 void setUi(){
-    setSize(300, 200);
+    setSize(300, 190);
     setLocationRelativeTo(null);
     setVisible(true);
 }

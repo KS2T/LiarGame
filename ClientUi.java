@@ -56,19 +56,6 @@ class ClientUi extends JFrame {
     }
 
 
-    void human() {                                                                          //todo 휴먼일경우
-        setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
-        String topic = null;                                                            //
-        topicTf.setText("주제: " + topic);
-
-    }
-
-    void liar() {                                                                           //todo 라이어일경우
-        setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
-        topicTf.setText("당신은 라이어입니다.");
-
-    }
-
 
     void init() {
 

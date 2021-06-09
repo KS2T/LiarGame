@@ -21,7 +21,7 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
     Font font;
     Thread th = new Thread(this);
 
-    {
+   /* {
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, file);
             File file = new File("bgm.wav");
@@ -39,7 +39,7 @@ class LoginUi extends JFrame implements ActionListener, Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void run() {
         if (currentThread().equals(th)) {

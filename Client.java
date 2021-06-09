@@ -45,7 +45,6 @@ class Client implements Runnable, ActionListener {
                   speak(spkMsg);
                   cui.chatTf.setText(null);
                   cui.chatTf.setEnabled(false);
-                  cui.chatTf.addActionListener(enter);
                   cui.chatTf.removeActionListener(enter2);
             }
       };
@@ -54,10 +53,10 @@ class Client implements Runnable, ActionListener {
             public void actionPerformed(ActionEvent e) {
                   spkMsg = cui.chatTf.getText();
                   spkMsg = spkMsg.trim();
+                  speak(spkMsg);
                   speak("liarTopic" + spkMsg);
                   cui.chatTf.setText(null);
                   cui.chatTf.setEnabled(false);
-                  cui.chatTf.addActionListener(enter);
                   cui.chatTf.removeActionListener(enter3);
             }
       };
@@ -70,9 +69,8 @@ class Client implements Runnable, ActionListener {
             this.id = cui.id;
             this.frame = cui;
             try {
-                  System.out.println(id +""+ ip +""+ port);
-                  s = new Socket("127.0.0.1",3000);
-                  System.out.println(s);
+                  System.out.println(id + ip + port);
+                  s = new Socket(ip, port);
                   is = s.getInputStream();
                   os = s.getOutputStream();
                   dis = new DataInputStream(is);
@@ -81,15 +79,14 @@ class Client implements Runnable, ActionListener {
                   String ent = dis.readUTF();
                   System.out.println(ent);
                   act();
-                  listenTh = new Thread(this);
                   if (ent.equals("falsefull")) {
                         System.out.println("enterfalse");
                         JOptionPane.showMessageDialog(null, "해당 서버의 인원이 가득 찼습니다", "인원 초과", 0);
                         dos.writeUTF("enterfalse");
                         dos.flush();
-                        cui.ui.reopen();
-                        cui.ui.clientBTn.doClick();
+                        reLogin();
                   } else {
+                        dos.writeUTF(id);
                         ent = dis.readUTF();
                         System.out.println(ent);
                         if (ent.equals("falseid")) {
@@ -97,34 +94,26 @@ class Client implements Runnable, ActionListener {
                               JOptionPane.showMessageDialog(null, "중복된 아이디가 있습니다.", "ID중복", 0);
                               dos.writeUTF("enterfalse");
                               dos.flush();
-                              cui.ui.reopen();
-                              cui.ui.clientBTn.doClick();
+                              reLogin();
                         } else if (ent.equals("3초후")) {
                               System.out.println("enterfalse");
                               JOptionPane.showMessageDialog(null, "해당 서버의 게임이 시작되었습니다.", "게임 시작", 0);
                               dos.writeUTF("enterfalse");
                               dos.flush();
-                              cui.ui.reopen();
-                              cui.ui.clientBTn.doClick();
+                              reLogin();
 
                         } else {
                               System.out.println("낫 폴스");
-                              dos.writeUTF(id);
                               dos.flush();
+                              listenTh = new Thread(this);
                               listenTh.start();
                         }
 
-                        System.out.println("낫 폴스");
-                        nop = dis.read();
-                        dos.writeUTF(id);
-                        dos.flush();
                   }
             } catch (IOException ie) {
                   System.out.println("Client ie: " + ie);
                   JOptionPane.showMessageDialog(null, "아이피 또는 포트가 올바르지 않습니다.", "연결 오류", 0);
-                  cui.dispose();
-                  cui.ui.reopen();
-                  cui.ui.clientBTn.doClick();
+                  reLogin();
             }
       }
 
@@ -161,6 +150,7 @@ class Client implements Runnable, ActionListener {
       void fromGm(String lsnMsg) {
 
             if (lsnMsg.startsWith("liar:")) {
+                  cui.setTitle(id + "(으)로 게임중..(ip: " + ip + ", port: " + port + ")");
                   if (lsnMsg.substring(5).equals(id)) {
                         cui.topicTf.setFont(new Font("맑은 고딕", Font.BOLD, 16));
                         cui.topicTf.setText("당신은 라이어입니다");
@@ -190,7 +180,7 @@ class Client implements Runnable, ActionListener {
                         cui.chatTf.setEnabled(true);
                         chatTimeTh = new Thread(this);
                         chatTimeTh.start();
-                        cui.chatTf.removeActionListener(enter);
+                        cui.chatTf.removeActionListener(enter2);
                         cui.chatTf.addActionListener(enter3);
                   }
             } else if (lsnMsg.startsWith("올언락")) {
@@ -198,10 +188,11 @@ class Client implements Runnable, ActionListener {
                   cui.chatTf.setText("");
                   cui.topicTf.setText("");
                   cui.timeTf.setText("");
-                  cui.chatTf.addActionListener(enter);
                   cui.chatTf.removeActionListener(enter2);
                   cui.chatTf.removeActionListener(enter3);
+                  cui.chatTf.addActionListener(enter);
                   idList.removeAllElements();
+                  cui.setTitle(id + "(으)로 채팅중..(ip: " + ip + ", port: " + port + ")");
             } else if (lsnMsg.startsWith("list")) {
                   idList.add(lsnMsg.substring(4));
             } else if (lsnMsg.startsWith("vote")) {
@@ -229,8 +220,13 @@ class Client implements Runnable, ActionListener {
                   ui.reopen();
             }
       }
+      void reLogin(){
 
+            cui.dispose();
+            cui.ui.reopen();
+            cui.ui.clientBTn.doClick();
 
+      }
       void speak(String str) {
             try {
                   if (str.startsWith("liar")) {
