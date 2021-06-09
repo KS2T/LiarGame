@@ -174,9 +174,9 @@ class ClientUi extends JFrame {
         taP.add(ta, BorderLayout.CENTER);
         taP.add(sp);
 
-        ta.setPreferredSize(new Dimension(700,500));
+        ta.setPreferredSize(new Dimension(650,500));
         ta.setEnabled(false);
-        ta.setDisabledTextColor(Color.white);
+        ta.setDisabledTextColor(Color.BLACK);
         //ta.setBackground(c2);
         ta.setLineWrap(true);
 
@@ -194,14 +194,12 @@ class ClientUi extends JFrame {
 
         chatP.setLayout(g);
         gc = new GridBagConstraints();
-
         gc.gridwidth = 6;
         gc.gridheight = 11;
         gc.weightx = 1;
 
         gc.gridx = 1;
         gc.gridy = 2;
-
         chatP.add(chatTf, gc);
 
         gc.gridx = 8;
@@ -239,8 +237,8 @@ class ClientUi extends JFrame {
 
     }
 
-    public static void main(String[] args) {
-        ClientUi c = new ClientUi();
-    }
+    //public static void main(String[] args) {
+    //    ClientUi c = new ClientUi();
+    //}
 
 }
