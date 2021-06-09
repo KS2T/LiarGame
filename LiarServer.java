@@ -12,7 +12,7 @@ class LiarServer extends Thread implements ActionListener {
       String portN;
       Vector<OneClientModul> v = new Vector<OneClientModul>();
       OneClientModul ocm;
-      Thread gameThread;
+      Thread gameThread= new Thread();
       Thread serverThread;
       ServerUi sui;
       String msg;
@@ -60,7 +60,6 @@ class LiarServer extends Thread implements ActionListener {
                               DataOutputStream dos = new DataOutputStream(os);
                               if (v.size() == 8) {
                                     dos.writeUTF("false");
-                                    System.out.println("false");
                               } else if (gameThread.isAlive() == true) {
                                     dos.writeUTF("true");
                                     dos.writeUTF("3초후");
@@ -176,7 +175,9 @@ class OneClientModul extends Thread {                                           
                   os = s.getOutputStream();
                   dis = new DataInputStream(is);
                   dos = new DataOutputStream(os);
+                  System.out.println("ocm 입장");
                   chatId = dis.readUTF();
+                  System.out.println("chatId : "+chatId);
                   if (chatId.equals("enterfalse")) {
                         closeAll();
                   }  else {
@@ -184,16 +185,18 @@ class OneClientModul extends Thread {                                           
                         Boolean checkId = true;
                         for (OneClientModul ocm : ls.v) {
                               if (ocm.chatId.equals(enterId)) {
+                                    System.out.println("중복 아이디 찾는중");
                                     checkId = false;
                                     continue;
                               }
                         }
                         if (checkId==false) {
-                              System.out.println(os);
-                              System.out.println(dos);
+                              System.out.println("중복아이디 있음");
                               dos.writeUTF("falseid");
                               System.out.println("falseid");
+                              closeAll();
                         }else{
+                              System.out.println("주ㅡㅇ복아이디 없음");
                               dos.writeUTF("true");
                         }
                   }
@@ -224,7 +227,8 @@ class OneClientModul extends Thread {                                           
                               if (ls.voteList.size() == ls.v.size()) {
                                     ls.gameThread.interrupt();
                               }
-                        } else {
+                        }else if(msg.equals("enterfalse")){
+                        }else {
                               broadcast(msg);
                         }
                   }
