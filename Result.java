@@ -69,7 +69,7 @@ class Result extends JDialog implements ActionListener,Runnable {
     void setUi() {
         setTitle("°á°ú!");
         setVisible(true);
-        setSize(380, 195);
+        setSize(380, 185);
         setResizable(false);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
