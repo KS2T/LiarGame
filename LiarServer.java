@@ -235,6 +235,7 @@ class OneClientModul extends Thread {                                           
             } catch (IOException ie) {
                   ls.v.remove(this);
                   broadcast(chatId + " 님이 퇴장하셨습니다. (현재 인원: " + ls.v.size() + "명)");
+                  ls.sui.idBox.removeItem(chatId);
             } finally {
                   closeAll();
             }

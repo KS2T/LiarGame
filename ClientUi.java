@@ -1,7 +1,9 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.ImageObserver;
 import java.awt.event.ActionEvent;
+import java.text.AttributedCharacterIterator;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
@@ -20,16 +22,20 @@ class ClientUi extends JFrame {
             super.paintComponent(g);
         }
     };
+    JTextArea idTa;
     JTextField topicTf, timeTf, chatTf;
-    String idList[] = {"asd", "assd", "asdasasdasdasdasdd"};
     JScrollPane sp;
-    JPanel tfP, p1, p2, taP, northP, endP, chatP;
+    JPanel tfP, taP, northP, endP, chatP;
+    JPanel p1, p2;
     RoundedButton endBtn = new RoundedButton("서버 나가기");
     Container cp;
     Font f = new Font("맑은 고딕", Font.BOLD, 20);
     Font f2 = new Font("맑은 고딕", Font.PLAIN, 20);
+    GridBagLayout g = new GridBagLayout();
+    GridBagConstraints gc, gc2;
+    Color c1, c2;
+    Dimension d1;
     Vector<PanelUi> pv = new Vector<>();
-
     ClientUi(LoginUi ui) {
         try {
             this.ui = ui;
@@ -56,8 +62,9 @@ class ClientUi extends JFrame {
     }
 
 
-
     void init() {
+
+
 
         cp = getContentPane();
         cp.setLayout(new BorderLayout());                                             //cp
@@ -66,6 +73,7 @@ class ClientUi extends JFrame {
         tfP = new ImagePanel("pBack.png");
         topicTf = new JTextField(10);
         topicTf.setEnabled(false);
+        topicTf.setFont(f);
         topicTf.setDisabledTextColor(Color.black);
 
         JPanel topicP = new JPanel(new BorderLayout());
@@ -90,13 +98,16 @@ class ClientUi extends JFrame {
         chatP.add(endBtn);
         cp.add(chatP, BorderLayout.SOUTH);                                               //chatTf
 
-        p1 = new JPanel();                                                                   //사이드패널
+
+        p1 = new JPanel(new BorderLayout());
+        JLabel lb =new JLabel(new ImageIcon(getClass().getResource("p1.jpg")));
+        //사이드패널
+        p1.add(lb);
         p1.setPreferredSize(new Dimension(150, 600));
-        p1.setLayout(new GridLayout(4, 1));
-        p2 = new JPanel();
+        p2 = new JPanel(new BorderLayout());
         p2.setPreferredSize(new Dimension(150, 600));
-        p2.setLayout(new GridLayout(4, 1));
-        new PanelUi(this);
+        lb =new JLabel(new ImageIcon(getClass().getResource("p2.jpg")));
+        p2.add(lb);
         //사이드패널 끝
 
         taP = new JPanel(new BorderLayout());
@@ -108,10 +119,12 @@ class ClientUi extends JFrame {
 
 
         ta.setLineWrap(true);
+        ta.setEnabled(false);
+        ta.setDisabledTextColor(new Color(200,150,100));
+        ta.setFont(new Font("맑은 고딕",Font.BOLD,20));
         cp.add(taP, BorderLayout.CENTER);
         cp.add(p1, BorderLayout.WEST);
         cp.add(p2, BorderLayout.EAST);
-
     }
 
 }

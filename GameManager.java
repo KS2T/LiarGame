@@ -45,6 +45,7 @@ public class GameManager {
             lockChat();
             ls.sleepTh(10);            ocmset();
             for (OneClientModul ocm : ocmSet) {
+                  ls.ocm.broadcast(ocm.chatId+"님이 입력중입니다.");
                   gm("채팅언락" + ocm.chatId);
                   ls.sleepTh(10);
 
@@ -105,7 +106,9 @@ public class GameManager {
             System.out.println("Max: " + voteId);
             if (liar.equals(voteId)) {
                   gm("votecom" + voteId);
-                  ls.ocm.broadcast("라이어를 찾았습니다. \nLiar: "+liar+" \n라이어가 제시어를 추리중입니다.");
+                  ls.ocm.broadcast("라이어를 찾았습니다." );
+                  ls.ocm.broadcast("Liar: "+liar);
+                  ls.ocm.broadcast("라이어가 제시어를 추리중입니다.");
                   ls.sleepTh(10);
                   String liarTopic;
                   liarTopic = ls.liarTopic;

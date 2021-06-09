@@ -71,8 +71,9 @@ class VoteDialog extends JDialog implements ActionListener,ListSelectionListener
         result = c.idList.get(index);
     }
 void setUi(){
-    setSize(300, 190);
+    setSize(300, 175);
     setLocationRelativeTo(null);
     setVisible(true);
+    setBackground(Color.black);
 }
 }
