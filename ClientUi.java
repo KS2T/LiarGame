@@ -1,12 +1,5 @@
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.ImageObserver;
-import java.awt.event.ActionEvent;
-import java.text.AttributedCharacterIterator;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.Vector;
 
 class ClientUi extends JFrame {

@@ -30,6 +30,7 @@ public class GameManager {
         vote();
         liarSelect();
         unlockAll();
+        ls.sui.startBtn.setEnabled(true);
     }
 
     void lockChat() {

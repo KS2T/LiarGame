@@ -1,5 +1,3 @@
-
-
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
@@ -290,7 +288,6 @@ class LoginDialog extends JDialog implements ActionListener, KeyListener { //   
             okBtn.doClick();
         }
     }
-
 } //로그인 다이얼로그
 
 class RoundedButton extends JButton {                                                       //라운디드 버튼 클래스
